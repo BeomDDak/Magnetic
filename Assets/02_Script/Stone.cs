@@ -5,55 +5,89 @@ using UnityEngine;
 public class Stone : MonoBehaviour
 {
 
-    public GameObject obj;
+    private GameObject stone;               // 돌
+
+    int stoneKind = 3;                      // 돌 종류
+    List<int> stoneIndex = new List<int>();                   // 선택될 돌
+    public GameObject[] playerStone;        // 플레이어가 사용할 돌
 
     [SerializeField]
-    private LayerMask layerMask;
+    private LayerMask layerMask;            // 레이어마스크
+    private RaycastHit hit;                 // 레이캐스트
+    private Vector3 landingPoint;           // 착지점
+    private Collider col;                   // 콜라이더
 
-    private RaycastHit hit;
-    private Vector3 pos;
-
-    [SerializeField]
-    private Collider collider;
-
-    private Material material;
-
-    
-    private void OnEnable()
+    private void Start()
     {
-        collider.isTrigger = true;
+        FirstRandomStone();
+        InitializeStone();
+        Debug.Log(stoneIndex[0]);
+        Debug.Log(stoneIndex[1]);
+    }
+
+    void FirstRandomStone()
+    {
+        // 최초 돌 랜덤으로 리스트에 2가지 넣어놓음
+        for (int i = 0; i < 2; i++)
+        {
+            int j = Random.Range(0, stoneKind);
+            stoneIndex.Add(j);
+        }
+    }
+
+    void InitializeStone()
+    {
+        stone = playerStone[stoneIndex[0]];
+
+        col = stone.GetComponent<Collider>();
     }
 
     private void FixedUpdate()
     {
+        // 빌딩시스템
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, 1000, layerMask))
         {
-            pos = hit.point;
+            landingPoint = hit.point;
         }
     }
 
     void Update()
     {
-        if(obj != null)
+        // 빌딩시스템
+        if (stone != null)
         {
-            obj.transform.position = pos;
-
-            
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButton(0))
             {
-                PlaceObject();
+                stone.transform.position = landingPoint;
+                col.isTrigger = true;
+            }
+            
+            if (Input.GetMouseButtonUp(0))
+            {
+                col.isTrigger = false;
+                LandingPointStone();
             }
         }
     }
 
-    void PlaceObject()
+    void LandingPointStone()
     {
-        Vector3 originPos;
-        originPos = obj.transform.position;
-        originPos.y += 1f;
-        obj.transform.position = originPos;
-        obj = null;
-        collider.isTrigger = false;
+        // 마우스를 왼쪽클릭을 놓으면 해당자리에서 y축으로 1만큼 위에서 떨어짐
+        Vector3 originlandingPoint;
+        originlandingPoint = stone.transform.position;
+        originlandingPoint.y += 1f;
+        stone.transform.position = originlandingPoint;
+
+        if (GameManager.Instance.isPlayerOneTurn)
+        {
+            Instantiate(playerStone[stoneIndex[0]], stone.transform.position, Quaternion.identity);
+        }
+        else
+        {
+            Instantiate(playerStone[stoneIndex[1]], stone.transform.position, Quaternion.identity);
+        }
+
+        GameManager.Instance.SwitchTurn();
     }
 }
