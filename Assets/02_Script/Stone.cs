@@ -5,20 +5,23 @@ using UnityEngine;
 public class Stone : MonoBehaviour
 {
 
-    private GameObject stone;               // 돌
+    private GameObject stone;                   // 돌
 
-    int stoneKind = 3;                      // 돌 종류
-    List<int> stoneIndex = new List<int>();                   // 선택될 돌
-    public GameObject[] playerStone;        // 플레이어가 사용할 돌
+    int stoneKind;                              // 돌 종류
+    List<int> stoneIndex = new List<int>();     // 선택될 돌
+    public GameObject[] playerStone;            // 플레이어가 사용할 돌
+    private int turn = 0;                       // 턴
 
     [SerializeField]
-    private LayerMask layerMask;            // 레이어마스크
-    private RaycastHit hit;                 // 레이캐스트
-    private Vector3 landingPoint;           // 착지점
-    private Collider col;                   // 콜라이더
+    private LayerMask layerMask;                // 레이어마스크
+    private RaycastHit hit;                     // 레이캐스트
+    private Vector3 landingPoint;               // 착지점
+    private Collider col;                       // 콜라이더
 
     private void Start()
     {
+        stoneKind = playerStone.Length;
+        Debug.Log(stoneKind);
         FirstRandomStone();
         InitializeStone();
         Debug.Log(stoneIndex[0]);
@@ -37,8 +40,7 @@ public class Stone : MonoBehaviour
 
     void InitializeStone()
     {
-        stone = playerStone[stoneIndex[0]];
-
+        stone = Instantiate(playerStone[stoneIndex[turn]], Vector3.zero, Quaternion.identity);
         col = stone.GetComponent<Collider>();
     }
 
@@ -57,15 +59,13 @@ public class Stone : MonoBehaviour
         // 빌딩시스템
         if (stone != null)
         {
-            if (Input.GetMouseButton(0))
-            {
-                stone.transform.position = landingPoint;
-                col.isTrigger = true;
-            }
+            stone.transform.position = landingPoint;
+            col.enabled = false;
             
             if (Input.GetMouseButtonUp(0))
             {
-                col.isTrigger = false;
+                col.enabled = true;
+                Destroy(stone);
                 LandingPointStone();
             }
         }
@@ -89,5 +89,7 @@ public class Stone : MonoBehaviour
         }
 
         GameManager.Instance.SwitchTurn();
+        turn = GameManager.Instance.isPlayerOneTurn ? 0 : 1;
+        InitializeStone();
     }
 }
