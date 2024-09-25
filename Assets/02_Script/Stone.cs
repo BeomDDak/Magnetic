@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Stone : MonoBehaviour
 {
-
     private GameObject stone;                   // 돌
 
     int stoneKind;                              // 돌 종류
@@ -59,8 +58,11 @@ public class Stone : MonoBehaviour
         // 빌딩시스템
         if (stone != null)
         {
-            stone.transform.position = landingPoint;
-            col.enabled = false;
+            if (Input.GetMouseButton(0))
+            {
+                stone.transform.position = landingPoint;
+                col.enabled = false;
+            }
             
             if (Input.GetMouseButtonUp(0))
             {
