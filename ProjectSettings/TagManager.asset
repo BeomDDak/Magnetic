@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Fluid
+  - Board
+  - LandingStone
+  - GroundStone
   layers:
   - Default
   - TransparentFX
@@ -15,7 +18,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Stone
   - Board
   - 
   - 

@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public bool isPlayerOneTurn = true;
+    public float magnetTime = 3;
 
     private void Awake()
     {
