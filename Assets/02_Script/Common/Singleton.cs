@@ -7,7 +7,7 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T>
     public static T m_instance;
     protected bool isDestoryOnLoad = false;
 
-    public static T instance
+    public static T Instance
     {
         get { return m_instance; }
     }
