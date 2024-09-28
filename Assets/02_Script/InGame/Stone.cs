@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Stone : MonoBehaviour
 {
-    /*private Rigidbody rb;
+    private Rigidbody rb;
 
     private void Awake()
     {
@@ -20,12 +20,12 @@ public class Stone : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Board"))
         {
-            GameManager.Instance.StoneManager.TriggerMagneticEffect(transform.position);
+            //GameManager.Instance.StoneManager.TriggerMagneticEffect(transform.position);
         }
     }
 
     private void OnDestroy()
     {
-        GameManager.Instance.StoneManager.RemoveStone(this);
-    }*/
+        //GameManager.Instance.StoneManager.RemoveStone(this);
+    }
 }

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Magnet : MonoBehaviour
 {
-    /*
     private float magnetRange = 2f;
     private float magnetMaxForce = 1f;
     private float magnetTime = 3f;
@@ -38,5 +37,4 @@ public class Magnet : MonoBehaviour
     {
         return Mathf.Lerp(magnetMaxForce, 0, distance / magnetRange);
     }
-    */
 }
