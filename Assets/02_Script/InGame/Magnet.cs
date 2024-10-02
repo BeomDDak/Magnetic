@@ -6,30 +6,50 @@ public class Magnet : MonoBehaviour
 {
     private float magnetRange = 2f;
     private float magnetMaxForce = 1f;
-    private float magnetTime = 3f;
+    private float magnetTime;
+    private Vector3 center;
 
-    public void ApplyMagneticEffect(Vector3 center, List<Stone> stones)
+
+    [SerializeField]
+    private LayerMask canClingLayer;
+
+    private void OnCollisionEnter(Collision collision)
     {
-        GameManager.Instance.StartCoroutine(PullStones(center, stones));
+        if (collision.collider.CompareTag("Board"))
+        {
+            center = GameManager.Instance.landing.landingPoint;
+            StartCoroutine(PullStones());
+        }
     }
 
-    private IEnumerator PullStones(Vector3 center, List<Stone> stones)
+    private IEnumerator PullStones()
     {
-        float elapsedTime = 0f;
-        while (elapsedTime < magnetTime)
+        Collider[] otherStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
+
+        // 범위 안에 아무것도 없으면 턴 종료
+        if(otherStones == null)
         {
-            foreach (var stone in stones)
+            GameManager.Instance.OnTurnChanged();
+        }
+        else
+        {
+            magnetTime = 3f;
+            magnetTime -= Time.deltaTime;
+            while (magnetTime >= 0f)
             {
-                float distance = Vector3.Distance(center, stone.transform.position);
-                if (distance <= magnetRange)
+                foreach (Collider stone in otherStones)
                 {
-                    float magnetForce = CalculateMagnetForce(distance);
-                    Vector3 pullDirection = (center - stone.transform.position).normalized;
-                    stone.ApplyForce(pullDirection * magnetForce);
+                    float distance = Vector3.Distance(center, stone.transform.position);
+                    if (distance <= magnetRange)
+                    {
+                        float magnetForce = CalculateMagnetForce(distance);
+                        Vector3 pullDirection = (center - stone.transform.position).normalized;
+                        stone.transform.position += pullDirection * magnetForce * Time.deltaTime;
+                        
+                    }
                 }
+                yield return null;
             }
-            elapsedTime += Time.deltaTime;
-            yield return null;
         }
     }
 

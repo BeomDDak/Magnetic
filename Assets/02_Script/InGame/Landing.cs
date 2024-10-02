@@ -7,12 +7,13 @@ public class Landing : StoneManager
 {
     [SerializeField]
     private LayerMask boardLayer;
-    private Vector3 landingPoint;
+    public Vector3 landingPoint { get; private set; }
 
     private void FixedUpdate()
     {
-        if (GameManager.CurrentPlayerState != PlayerState.PlayTime)
+        if (GameManager.CurrentState == GameState.GameOver)
             return;
+
         // 마우스 위치로 랜딩포인트 변경
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -43,6 +44,7 @@ public class Landing : StoneManager
             }
         }
     }
+
     private void LandingPointStone()
     {
         // 마우스를 왼쪽클릭을 놓으면 해당자리에서 y축으로 1만큼 위에서 떨어짐

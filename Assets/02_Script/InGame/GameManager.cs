@@ -14,7 +14,7 @@ public class GameManager : Singleton<GameManager>
     // 다른 스크립트 연결
     private StoneManager stoneManager;
     private PlayerManager playerManager;
-    private Landing landing;
+    public Landing landing { get; private set; }
     private Magnet magnet;
 
     // 액션

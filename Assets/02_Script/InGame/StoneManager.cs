@@ -48,5 +48,4 @@ public class StoneManager : MonoBehaviour
         // 콜라이더도 붙여주기
         stoneColl = landingStone.GetComponent<Collider>();
     }
-
 }
