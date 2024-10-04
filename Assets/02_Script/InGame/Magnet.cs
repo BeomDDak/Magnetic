@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class Magnet : MonoBehaviour
 {
-    private float magnetRange = 2f;
-    private float magnetMaxForce = 1f;
-    private float magnetTime;
+    public float magnetRange = 2f;
+    public float magnetMaxForce = 1f;
+    public float magnetTime;
     private Vector3 center;
-
+    
 
     [SerializeField]
     private LayerMask canClingLayer;
@@ -20,6 +20,11 @@ public class Magnet : MonoBehaviour
             center = GameManager.Instance.landing.landingPoint;
             StartCoroutine(PullStones());
         }
+
+        if (collision.collider.CompareTag("Stone"))
+        {
+            collision.gameObject.AddComponent<Magnet>();
+        }
     }
 
     private IEnumerator PullStones()
@@ -29,7 +34,7 @@ public class Magnet : MonoBehaviour
         // 범위 안에 아무것도 없으면 턴 종료
         if(otherStones == null)
         {
-            GameManager.Instance.OnTurnChanged();
+            GameManager.Instance.SwitchTurn();
         }
         else
         {
@@ -55,6 +60,6 @@ public class Magnet : MonoBehaviour
 
     private float CalculateMagnetForce(float distance)
     {
-        return Mathf.Lerp(magnetMaxForce, 0, distance / magnetRange);
+        return Mathf.Lerp(magnetMaxForce, 0f, distance / magnetRange);
     }
 }

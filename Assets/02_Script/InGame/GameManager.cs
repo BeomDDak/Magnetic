@@ -19,7 +19,7 @@ public class GameManager : Singleton<GameManager>
 
     // 액션
     public Action<GameState> OnGameStateChanged;      // 게임 상태 변경
-    public Action OnTurnChanged;                             // 턴 변경
+    public Action OnTurnChanged;                      // 턴 변경
 
     protected override void Init()
     {
