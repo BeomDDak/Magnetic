@@ -31,31 +31,32 @@ public class Magnet : MonoBehaviour
     {
         Collider[] otherStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
 
-        // 범위 안에 아무것도 없으면 턴 종료
+        // 당기는 범위 안에 아무것도 없으면 턴 종료
         if(otherStones == null)
         {
             GameManager.Instance.SwitchTurn();
+            yield break;
         }
-        else
+
+        magnetTime = 3f;    // 3초간 당김
+        
+        while (magnetTime > 0f)
         {
-            magnetTime = 3f;
             magnetTime -= Time.deltaTime;
-            while (magnetTime >= 0f)
+            foreach (Collider stone in otherStones)
             {
-                foreach (Collider stone in otherStones)
+                float distance = Vector3.Distance(center, stone.transform.position);
+                if (distance <= magnetRange)
                 {
-                    float distance = Vector3.Distance(center, stone.transform.position);
-                    if (distance <= magnetRange)
-                    {
-                        float magnetForce = CalculateMagnetForce(distance);
-                        Vector3 pullDirection = (center - stone.transform.position).normalized;
-                        stone.transform.position += pullDirection * magnetForce * Time.deltaTime;
-                        
-                    }
+                    float magnetForce = CalculateMagnetForce(distance);
+                    Vector3 pullDirection = (center - stone.transform.position).normalized;
+                    stone.transform.position += pullDirection * magnetForce * Time.deltaTime;
+                    
                 }
-                yield return null;
             }
+            yield return null;
         }
+        GameManager.Instance.SwitchTurn();
     }
 
     private float CalculateMagnetForce(float distance)

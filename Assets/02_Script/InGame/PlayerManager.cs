@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Define;
 
-public class PlayerManager
+public class PlayerManager : MonoBehaviour
 {
     private Dictionary<Player, int> stoneCount = new Dictionary<Player, int>();
 
@@ -34,5 +34,11 @@ public class PlayerManager
     public void IncrementStoneCount(int clingStone, Player player)
     {
         stoneCount[player] += clingStone;
+    }
+
+    // 플레이어 돌 갯수 
+    public int GetStoneCount(Player player)
+    {
+        return stoneCount[player];
     }
 }

@@ -4,39 +4,49 @@ using UnityEngine;
 
 public class Stone : MonoBehaviour
 {
-    private Rigidbody rb;
+    private List<FixedJoint> joints = new List<FixedJoint>();
     private Magnet magnet;
-    private List <FixedJoint> joints = new List<FixedJoint>();
-    private bool canAttach = true;
-
+    
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
         magnet = GetComponent<Magnet>();
-    }
-
-    public void ApplyForce(Vector3 force)
-    {
-        rb.AddForce(force, ForceMode.Force);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (canAttach && collision.gameObject.CompareTag("Stone"))
+        Stone otherAttacher = collision.gameObject.GetComponent<Stone>();
+        if (otherAttacher != null && !IsConnectedTo(otherAttacher.gameObject))
         {
-            Attach(collision.gameObject);
+            AttachObject(otherAttacher.gameObject);
         }
     }
 
-    private void Attach(GameObject target)
+    private void AttachObject(GameObject obj)
     {
+        Rigidbody objRb = obj.GetComponent<Rigidbody>();
+        if (objRb == null)
+        {
+            objRb = obj.AddComponent<Rigidbody>();
+        }
+
         FixedJoint newJoint = gameObject.AddComponent<FixedJoint>();
+        newJoint.connectedBody = objRb;
         joints.Add(newJoint);
+
+        // 붙은 오브젝트의 질량을 조정
+        objRb.mass = 0f;
+        objRb.drag = 0f;
+        objRb.angularDrag = 0.5f;
 
         // 시간 초기화 및 파워, 범위 증가
         magnet.magnetTime = 3f;
         magnet.magnetRange += 1;
         magnet.magnetMaxForce += 1;
+    }
+
+    private bool IsConnectedTo(GameObject obj)
+    {
+        return joints.Exists(j => j.connectedBody.gameObject == obj);
     }
 
 }
