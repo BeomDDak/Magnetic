@@ -34,7 +34,7 @@ public class Stone : MonoBehaviour
         joints.Add(newJoint);
 
         // 붙은 오브젝트의 질량을 조정
-        objRb.mass = 0f;
+        objRb.mass = 1f;
         objRb.drag = 0f;
         objRb.angularDrag = 0.5f;
 

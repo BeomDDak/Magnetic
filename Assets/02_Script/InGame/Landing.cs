@@ -5,14 +5,13 @@ using static Define;
 
 public class Landing : MonoBehaviour
 {
-
     // 필요한 매니저
     private StoneManager stoneManager;
     private PlayerManager playerManager;
     GameManager gameManager;
 
     [SerializeField] private LayerMask boardLayer;      // 보드판
-    public Vector3 landingPoint { get; private set; }   // 착수될 위치
+    public Vector3 landingPoint;   // 착수될 위치
 
     private void Awake()
     {
@@ -45,7 +44,7 @@ public class Landing : MonoBehaviour
         {
             stoneManager.landingStone.transform.position = landingPoint;
             stoneManager.stoneColl.enabled = false;
-            PreviewStone();
+            PreviewLandingPoint();
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -56,7 +55,7 @@ public class Landing : MonoBehaviour
         }
     }
 
-    private void PreviewStone()
+    private void PreviewLandingPoint()
     {
         // 마우스 위치로 랜딩포인트 변경
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -76,7 +75,7 @@ public class Landing : MonoBehaviour
         originlandingPoint.y += 1f;
         stoneManager.landingStone.transform.position = originlandingPoint;
 
-        GameObject pullStone;
+        GameObject pullStone;       // 실제 보드판 위에 생성될 돌
 
         if (gameManager.CurrentPlayer == Player.One)
         {
@@ -89,10 +88,11 @@ public class Landing : MonoBehaviour
                 stoneManager.landingStone.transform.position, Quaternion.identity);
         }
 
-        playerManager.DecrementStoneCount(gameManager.CurrentPlayer);
         pullStone.AddComponent<Magnet>();
-
-        // GameManager.Instance.CurrentPlayerState = PlayerState.Wait;
+        pullStone.AddComponent<Stone>();
+        playerManager.DecrementStoneCount(gameManager.CurrentPlayer);
+        
+        gameManager.CurrentPlayerState = PlayerState.Wait;
         Debug.Log("현재 차례 : " + gameManager.CurrentPlayer);
         Debug.Log($"플레이어 : {gameManager.CurrentPlayer} 남은돌 : {playerManager.stoneCount[gameManager.CurrentPlayer]}");
     }

@@ -1,45 +1,54 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Define;
 
 public class Magnet : MonoBehaviour
 {
-    public float magnetRange = 2f;
+    GameManager gameManager;
+    Landing landing;
+    public float magnetRange = 0.5f;
     public float magnetMaxForce = 1f;
     public float magnetTime;
     private Vector3 center;
-    
+    private int canClingLayer;
 
-    [SerializeField]
-    private LayerMask canClingLayer;
+    private void Awake()
+    {
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+        landing = GameObject.FindGameObjectWithTag("GameManager").GetComponent<Landing>();
+        canClingLayer = 1 << 9;
+        this.GetComponent<Magnet>().enabled = false;
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("보드판 부딪힘");
         if (collision.collider.CompareTag("Board"))
         {
-            center = GameManager.Instance.landing.landingPoint;
+            this.gameObject.GetComponent<Magnet>().enabled = true;
+            center = landing.landingPoint;
             StartCoroutine(PullStones());
-        }
-
-        if (collision.collider.CompareTag("Stone"))
-        {
-            collision.gameObject.AddComponent<Magnet>();
         }
     }
 
-    private IEnumerator PullStones()
+    public IEnumerator PullStones()
     {
+        Debug.Log("풀스톤 시작");
+        
         Collider[] otherStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
 
-        // 당기는 범위 안에 아무것도 없으면 턴 종료
-        if(otherStones == null)
+        if (otherStones.Length == 1)
         {
-            GameManager.Instance.SwitchTurn();
+            Debug.Log("주변에 돌이 없습니다. 턴을 종료합니다.");
+            gameManager.SwitchTurn();
             yield break;
         }
 
-        magnetTime = 3f;    // 3초간 당김
-        
+        Debug.Log($"주변에 {otherStones.Length}개의 돌이 감지되었습니다.");
+
+        magnetTime = 3f;
+
         while (magnetTime > 0f)
         {
             magnetTime -= Time.deltaTime;
@@ -56,7 +65,8 @@ public class Magnet : MonoBehaviour
             }
             yield return null;
         }
-        GameManager.Instance.SwitchTurn();
+        gameManager.SwitchTurn();
+        this.GetComponent<Magnet>().enabled = false;
     }
 
     private float CalculateMagnetForce(float distance)
