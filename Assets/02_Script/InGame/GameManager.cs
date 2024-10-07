@@ -13,7 +13,7 @@ public class GameManager : Singleton<GameManager>
 
     // 다른 스크립트 연결
     private StoneManager stoneManager;
-    private PlayerManager playerManager;
+    public PlayerManager playerManager;
     public Landing landing;
 
     // 액션
@@ -69,8 +69,11 @@ public class GameManager : Singleton<GameManager>
 
     private void Update()
     {
-        Debug.Log(CurrentPlayer);
-        Debug.Log(CurrentPlayerState);
+        if(CurrentState == GameState.GameOver) 
+        {
+            SceneLoader.Instance.LoadScene(SceneType.Lobby);
+        }
+
         if(CurrentPlayerState == PlayerState.PlayTime)
         {
             OnGame?.Invoke();

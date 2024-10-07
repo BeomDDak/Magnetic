@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using static Define;
 
 public class Landing : MonoBehaviour
@@ -34,6 +35,11 @@ public class Landing : MonoBehaviour
     {
         // 현재 플레이어의 랜딩 시작
         Debug.Log($"랜딩 시작");
+
+        if(playerManager.stoneCount.Any(pair => pair.Value == 0))
+        {
+            gameManager.CurrentState = GameState.GameOver;
+        }
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -90,6 +96,7 @@ public class Landing : MonoBehaviour
 
         pullStone.AddComponent<Magnet>();
         pullStone.AddComponent<Stone>();
+        pullStone.GetComponent<Stone>().m_CurrentPlayer = gameManager.CurrentPlayer;
         playerManager.DecrementStoneCount(gameManager.CurrentPlayer);
         
         gameManager.CurrentPlayerState = PlayerState.Wait;

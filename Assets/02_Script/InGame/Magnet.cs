@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using static Define;
 
 public class Magnet : MonoBehaviour
@@ -36,23 +37,30 @@ public class Magnet : MonoBehaviour
     {
         Debug.Log("풀스톤 시작");
         
-        Collider[] otherStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
+        Collider[] anyStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
+        Collider[] opponentStones = anyStones
+            .Where(collider => collider.gameObject != this.gameObject)
+            .Where(collider =>
+            {
+                Stone stone = collider.gameObject.GetComponent<Stone>();
+                return stone != null && stone.m_CurrentPlayer != gameManager.CurrentPlayer;
+            }).ToArray();
 
-        if (otherStones.Length == 1)
+        if (opponentStones.Length == 0)
         {
             Debug.Log("주변에 돌이 없습니다. 턴을 종료합니다.");
             gameManager.SwitchTurn();
             yield break;
         }
 
-        Debug.Log($"주변에 {otherStones.Length}개의 돌이 감지되었습니다.");
+        Debug.Log($"주변에 {anyStones.Length}개의 돌이 감지되었습니다.");
 
         magnetTime = 3f;
 
         while (magnetTime > 0f)
         {
             magnetTime -= Time.deltaTime;
-            foreach (Collider stone in otherStones)
+            foreach (Collider stone in anyStones)
             {
                 float distance = Vector3.Distance(center, stone.transform.position);
                 if (distance <= magnetRange)
@@ -65,6 +73,23 @@ public class Magnet : MonoBehaviour
             }
             yield return null;
         }
+
+        if(opponentStones.Length != 0)
+        {
+            // 상대방 플레이어 결정
+            Player opponentPlayer = (gameManager.CurrentPlayer == Player.One) ? Player.Two : Player.One;
+
+            // 상대방 플레이어의 돌 갯수 증가
+            gameManager.playerManager.IncrementStoneCount(opponentStones.Length, opponentPlayer);
+
+            foreach (var stone in opponentStones)
+            {
+                Destroy(stone.gameObject);
+            }
+            Destroy(gameObject);
+            
+        }
+
         gameManager.SwitchTurn();
         this.GetComponent<Magnet>().enabled = false;
     }

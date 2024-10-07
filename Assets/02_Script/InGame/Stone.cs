@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Define;
 
 public class Stone : MonoBehaviour
 {
     private List<FixedJoint> joints = new List<FixedJoint>();
     private Magnet magnet;
-    
+    public Player m_CurrentPlayer;
+
     private void Awake()
     {
         magnet = GetComponent<Magnet>();
+        m_CurrentPlayer = Player.None;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -18,6 +21,7 @@ public class Stone : MonoBehaviour
         if (otherAttacher != null && !IsConnectedTo(otherAttacher.gameObject))
         {
             AttachObject(otherAttacher.gameObject);
+            StartCoroutine(collision.gameObject.GetComponent<Magnet>().PullStones());
         }
     }
 
@@ -40,8 +44,8 @@ public class Stone : MonoBehaviour
 
         // 시간 초기화 및 파워, 범위 증가
         magnet.magnetTime = 3f;
-        magnet.magnetRange += 1;
-        magnet.magnetMaxForce += 1;
+        magnet.magnetRange += 0.2f;
+        magnet.magnetMaxForce += 0.1f;
     }
 
     private bool IsConnectedTo(GameObject obj)
