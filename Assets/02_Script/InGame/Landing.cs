@@ -21,7 +21,7 @@ public class Landing : MonoBehaviour
 
     private void Start()
     {
-        gameManager.OnTurnChanged += StartLanding;
+        gameManager.OnGame += StartLanding;
     }
 
     private void InitManager()
@@ -31,10 +31,10 @@ public class Landing : MonoBehaviour
         gameManager = GetComponent<GameManager>();
     }
 
-    private void StartLanding(Player player)
+    private void StartLanding()
     {
         // 현재 플레이어의 랜딩 시작
-        Debug.Log($"랜딩 시작 {player}");
+        Debug.Log($"랜딩 시작");
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -78,7 +78,7 @@ public class Landing : MonoBehaviour
 
         GameObject pullStone;
 
-        if (GameManager.Instance.CurrentPlayer == Player.One)
+        if (gameManager.CurrentPlayer == Player.One)
         {
             pullStone = Instantiate(stoneManager._stoneTypes[stoneManager.stoneIndex[0]], 
                 stoneManager.landingStone.transform.position, Quaternion.identity);
@@ -89,9 +89,11 @@ public class Landing : MonoBehaviour
                 stoneManager.landingStone.transform.position, Quaternion.identity);
         }
 
-        playerManager.DecrementStoneCount(GameManager.Instance.CurrentPlayer);
+        playerManager.DecrementStoneCount(gameManager.CurrentPlayer);
         pullStone.AddComponent<Magnet>();
 
-        GameManager.Instance.CurrentPlayerState = PlayerState.Wait;
+        // GameManager.Instance.CurrentPlayerState = PlayerState.Wait;
+        Debug.Log("현재 차례 : " + gameManager.CurrentPlayer);
+        Debug.Log($"플레이어 : {gameManager.CurrentPlayer} 남은돌 : {playerManager.stoneCount[gameManager.CurrentPlayer]}");
     }
 }

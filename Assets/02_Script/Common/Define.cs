@@ -14,6 +14,7 @@ public class Define
     {
         One,
         Two,
+        Count,
     }
 
     public enum PlayerState

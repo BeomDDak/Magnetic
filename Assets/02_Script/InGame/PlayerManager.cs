@@ -5,7 +5,7 @@ using static Define;
 
 public class PlayerManager : MonoBehaviour
 {
-    private Dictionary<Player, int> stoneCount = new Dictionary<Player, int>();
+    public Dictionary<Player, int> stoneCount = new Dictionary<Player, int>();
 
     // 게임 시작시 초기화 해줄 함수
     public PlayerManager()
@@ -14,7 +14,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     // 초기 돌 갯수 설정
-    private void InitializePlayers()
+    public void InitializePlayers()
     {
         stoneCount[Player.One] = 10;
         stoneCount[Player.Two] = 10;
