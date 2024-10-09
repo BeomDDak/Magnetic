@@ -60,7 +60,7 @@ public class GameManager : Singleton<GameManager>
     // 턴 변경
     public void SwitchTurn()
     {
-        Debug.Log("SwitchTurn called. Current player before switch: " + CurrentPlayer);
+        Debug.Log("현재 차례 : " + CurrentPlayer);
         CurrentPlayer = (CurrentPlayer == Player.One) ? Player.Two : Player.One;
         Debug.Log("Turn switched. New current player: " + CurrentPlayer);
         CurrentPlayerState = PlayerState.PlayTime;

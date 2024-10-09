@@ -5,7 +5,8 @@ using static Define;
 
 public class Stone : MonoBehaviour
 {
-    private List<FixedJoint> joints = new List<FixedJoint>();
+
+    public List<FixedJoint> joints = new List<FixedJoint>();
     private Magnet magnet;
     public Player m_CurrentPlayer;
 
@@ -46,6 +47,7 @@ public class Stone : MonoBehaviour
         magnet.magnetTime = 3f;
         magnet.magnetRange += 0.2f;
         magnet.magnetMaxForce += 0.1f;
+
     }
 
     private bool IsConnectedTo(GameObject obj)

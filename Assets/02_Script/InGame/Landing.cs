@@ -34,8 +34,6 @@ public class Landing : MonoBehaviour
     private void StartLanding()
     {
         // 현재 플레이어의 랜딩 시작
-        Debug.Log($"랜딩 시작");
-
         if(playerManager.stoneCount.Any(pair => pair.Value == 0))
         {
             gameManager.CurrentState = GameState.GameOver;
@@ -94,13 +92,15 @@ public class Landing : MonoBehaviour
                 stoneManager.landingStone.transform.position, Quaternion.identity);
         }
 
+        playerManager.DecrementStoneCount(gameManager.CurrentPlayer);
+
+        Debug.Log($"플레이어 : {gameManager.CurrentPlayer} 남은돌 : {playerManager.stoneCount[gameManager.CurrentPlayer]}");
+
         pullStone.AddComponent<Magnet>();
         pullStone.AddComponent<Stone>();
         pullStone.GetComponent<Stone>().m_CurrentPlayer = gameManager.CurrentPlayer;
-        playerManager.DecrementStoneCount(gameManager.CurrentPlayer);
         
         gameManager.CurrentPlayerState = PlayerState.Wait;
-        Debug.Log("현재 차례 : " + gameManager.CurrentPlayer);
-        Debug.Log($"플레이어 : {gameManager.CurrentPlayer} 남은돌 : {playerManager.stoneCount[gameManager.CurrentPlayer]}");
+
     }
 }

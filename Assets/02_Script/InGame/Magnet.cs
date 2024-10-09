@@ -8,8 +8,11 @@ public class Magnet : MonoBehaviour
 {
     GameManager gameManager;
     Landing landing;
-    public float magnetRange = 0.5f;
-    public float magnetMaxForce = 1f;
+    PlayerManager playerManager;
+    Stone m_stone;
+
+    public float magnetRange;
+    public float magnetMaxForce;
     public float magnetTime;
     private Vector3 center;
     private int canClingLayer;
@@ -18,16 +21,18 @@ public class Magnet : MonoBehaviour
     {
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         landing = GameObject.FindGameObjectWithTag("GameManager").GetComponent<Landing>();
+        playerManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<PlayerManager>();
         canClingLayer = 1 << 9;
         this.GetComponent<Magnet>().enabled = false;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("보드판 부딪힘");
+
         if (collision.collider.CompareTag("Board"))
         {
             this.gameObject.GetComponent<Magnet>().enabled = true;
+            m_stone = GetComponent<Stone>();
             center = landing.landingPoint;
             StartCoroutine(PullStones());
         }
@@ -36,7 +41,10 @@ public class Magnet : MonoBehaviour
     public IEnumerator PullStones()
     {
         Debug.Log("풀스톤 시작");
-        
+
+        magnetRange = 0.5f;
+        magnetMaxForce = 1f;
+
         Collider[] anyStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
         Collider[] opponentStones = anyStones
             .Where(collider => collider.gameObject != this.gameObject)
@@ -46,7 +54,7 @@ public class Magnet : MonoBehaviour
                 return stone != null && stone.m_CurrentPlayer != gameManager.CurrentPlayer;
             }).ToArray();
 
-        if (opponentStones.Length == 0)
+        if (anyStones.Length == 1)
         {
             Debug.Log("주변에 돌이 없습니다. 턴을 종료합니다.");
             gameManager.SwitchTurn();
@@ -56,7 +64,7 @@ public class Magnet : MonoBehaviour
         Debug.Log($"주변에 {anyStones.Length}개의 돌이 감지되었습니다.");
 
         magnetTime = 3f;
-
+        
         while (magnetTime > 0f)
         {
             magnetTime -= Time.deltaTime;
@@ -71,23 +79,25 @@ public class Magnet : MonoBehaviour
                     
                 }
             }
+            Debug.Log(magnetMaxForce);
             yield return null;
         }
 
-        if(opponentStones.Length != 0)
+        Debug.Log(m_stone.joints.Count);
+        if(opponentStones.Length != 0 && m_stone.joints.Count != 0)
         {
             // 상대방 플레이어 결정
             Player opponentPlayer = (gameManager.CurrentPlayer == Player.One) ? Player.Two : Player.One;
 
             // 상대방 플레이어의 돌 갯수 증가
-            gameManager.playerManager.IncrementStoneCount(opponentStones.Length, opponentPlayer);
+            playerManager.IncrementStoneCount(opponentStones.Length, opponentPlayer);
 
-            foreach (var stone in opponentStones)
+            foreach (Collider stone in opponentStones)
             {
-                Destroy(stone.gameObject);
+                stone.gameObject.SetActive(false);
             }
-            Destroy(gameObject);
-            
+            gameManager.SwitchTurn();
+            this.gameObject.SetActive(false);
         }
 
         gameManager.SwitchTurn();
