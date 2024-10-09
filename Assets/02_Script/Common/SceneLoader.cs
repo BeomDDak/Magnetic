@@ -12,6 +12,11 @@ public enum SceneType
 
 public class SceneLoader : Singleton<SceneLoader>
 {
+    protected override void Init()
+    {
+        base.Init();
+    }
+
     public void LoadScene(SceneType sceneType)
     {
         SceneManager.LoadScene(sceneType.ToString());

@@ -10,6 +10,7 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T>
     public static T Instance
     {
         get { return m_instance; }
+        set { m_instance = value; }
     }
 
     protected virtual void Init()

@@ -9,6 +9,7 @@ TagManager:
   - LandingStone
   - GroundStone
   - GameManager
+  - Loader
   layers:
   - Default
   - TransparentFX
