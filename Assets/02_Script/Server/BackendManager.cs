@@ -20,9 +20,9 @@ public class BackendManager : Singleton<BackendManager>
         }
 
         //SignUp();
-        Login();
-        UpdateNickname();
-        GameDataInsert();
+        //Login();
+        //UpdateNickname();
+        //GameDataInsert();
     }
 
     void SignUp()
