@@ -2,9 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using BackEnd;
+using UnityEngine.UI;
+using TMPro;
 
 public class BackendManager : Singleton<BackendManager>
 {
+    // 로그인
+    [SerializeField]
+    private TMP_InputField backendLoginID;
+    [SerializeField]
+    private TMP_InputField backendLoginPass;
+
+    // 회원가입
+    [SerializeField]
+    private TMP_InputField backendSignUpID;
+    [SerializeField]
+    private TMP_InputField backendSignUpPass;
+    [SerializeField]
+    private TMP_InputField backendSignUpPassChaeck;
+
+
+
+
     void Start()
     {
         var bro = Backend.Initialize(); // 뒤끝 초기화
@@ -18,23 +37,23 @@ public class BackendManager : Singleton<BackendManager>
         {
             Debug.LogError("초기화 실패 : " + bro); // 실패일 경우 statusCode 400대 에러 발생
         }
-
-        //SignUp();
-        //Login();
-        //UpdateNickname();
-        //GameDataInsert();
     }
 
-    void SignUp()
+    public void SignUp()
     {
-        BackendLogin.Instance.CustomSignUp("user1", "1234"); // [추가] 뒤끝 회원가입 함수
-        Debug.Log("테스트를 종료합니다.");
-        
+        string _id = backendSignUpID.text;
+        string _pass = backendSignUpPass.text;
+        string _passCheck = backendSignUpPassChaeck.text;
+
+        BackendLogin.Instance.CustomSignUp(_id, _pass,_passCheck);
+
     }
 
-    void Login()
+    public void Login()
     {
-        BackendLogin.Instance.CustomLogin("user1", "1234"); // [추가] 뒤끝 회원가입 함수
+        string _id = backendLoginID.text;
+        string _pass = backendLoginPass.text;
+        BackendLogin.Instance.CustomLogin(_id, _pass); // 뒤끝 로그인 함수
         Debug.Log("테스트를 종료합니다.");
     }
 
