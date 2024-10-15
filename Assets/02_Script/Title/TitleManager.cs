@@ -1,19 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BackEnd;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames;
 
 public class TitleManager : MonoBehaviour
 {
-    SceneLoader loader;
+    [SerializeField]
+    private GameObject LoginUI;
 
     public float[] moveSpeed;
     float m_time = 0.3f;
     public GameObject[] productObj;
-
-    private void Awake()
-    {
-        loader = GameObject.FindGameObjectWithTag("Loader").GetComponent<SceneLoader>();
-    }
 
     private void Start()
     {
@@ -35,8 +34,24 @@ public class TitleManager : MonoBehaviour
         }
     }
 
-    public void OnClickGameStart()
+    public void OnClickLogin()
     {
-        loader.LoadScene(SceneType.Lobby);
+        BackendReturnObject bro = Backend.BMember.LoginWithTheBackendToken();
+        if (bro.IsSuccess())
+        {
+            Debug.Log("뒤끝 로그인 성공");
+            SceneLoader.Instance.LoadScene(SceneType.Lobby);
+        }
+        else if (!bro.IsSuccess())
+        {
+            Debug.Log("구글 로그인 성공");
+            GoogleManager.Instance.GoogleLogin();
+            SceneLoader.Instance.LoadScene(SceneType.Lobby);
+        }
+        else
+        {
+            Debug.Log("자동 로그인 실패");
+            LoginUI.SetActive(true);
+        }
     }
 }

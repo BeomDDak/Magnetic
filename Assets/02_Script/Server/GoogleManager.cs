@@ -4,7 +4,7 @@ using UnityEngine;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 
-public class GoogleManager : MonoBehaviour
+public class GoogleManager : Singleton<GoogleManager>
 {
     public void GoogleLogin()
     {

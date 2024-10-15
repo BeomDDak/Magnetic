@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using BackEnd;
-using UnityEngine.UI;
 using TMPro;
 
 public class BackendManager : Singleton<BackendManager>
@@ -20,9 +19,6 @@ public class BackendManager : Singleton<BackendManager>
     private TMP_InputField backendSignUpPass;
     [SerializeField]
     private TMP_InputField backendSignUpPassChaeck;
-
-
-
 
     void Start()
     {
