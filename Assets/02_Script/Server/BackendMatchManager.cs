@@ -35,8 +35,6 @@ public partial class BackendMatchManager : MonoBehaviour
         public double winRate = 0;
     }
 
-    private static BackendMatchManager instance = null; // 인스턴스
-
     public List<MatchInfo> matchInfos { get; private set; } = new List<MatchInfo>();  // 콘솔에서 생성한 매칭 카드들의 리스트
 
     public List<SessionId> sessionIdList { get; private set; }              // 매치에 참가중인 유저들의 세션 목록

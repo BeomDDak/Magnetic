@@ -46,13 +46,6 @@ public class Magnet : MonoBehaviour
         magnetMaxForce = 1f;
 
         Collider[] anyStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
-        Collider[] opponentStones = anyStones
-            .Where(collider => collider.gameObject != this.gameObject)
-            .Where(collider =>
-            {
-                Stone stone = collider.gameObject.GetComponent<Stone>();
-                return stone != null && stone.m_CurrentPlayer != gameManager.CurrentPlayer;
-            }).ToArray();
 
         if (anyStones.Length == 1)
         {
@@ -84,18 +77,19 @@ public class Magnet : MonoBehaviour
         }
 
         Debug.Log(m_stone.joints.Count);
-        if(opponentStones.Length != 0 && m_stone.joints.Count != 0)
+        if(m_stone.joints.Count != 0)
         {
             // 상대방 플레이어 결정
             Player opponentPlayer = (gameManager.CurrentPlayer == Player.One) ? Player.Two : Player.One;
 
             // 상대방 플레이어의 돌 갯수 증가
-            playerManager.IncrementStoneCount(opponentStones.Length, opponentPlayer);
+            playerManager.IncrementStoneCount(m_stone.CountConnectedObjects().Count, opponentPlayer);
 
-            foreach (Collider stone in opponentStones)
+            for(int i = 0; i < m_stone.CountConnectedObjects().Count; i++)
             {
-                stone.gameObject.SetActive(false);
+                m_stone.CountConnectedObjects()[i].SetActive(false);
             }
+
             gameManager.SwitchTurn();
             this.gameObject.SetActive(false);
         }

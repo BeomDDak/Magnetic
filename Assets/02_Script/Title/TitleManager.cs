@@ -36,7 +36,8 @@ public class TitleManager : MonoBehaviour
 
     public void OnClickLogin()
     {
-        BackendReturnObject bro = Backend.BMember.LoginWithTheBackendToken();
+        LoginUI.SetActive(true);
+        /*BackendReturnObject bro = Backend.BMember.LoginWithTheBackendToken();
         if (bro.IsSuccess())
         {
             Debug.Log("뒤끝 로그인 성공");
@@ -52,6 +53,6 @@ public class TitleManager : MonoBehaviour
         {
             Debug.Log("자동 로그인 실패");
             LoginUI.SetActive(true);
-        }
+        }*/
     }
 }

@@ -5,10 +5,11 @@ using static Define;
 
 public class Stone : MonoBehaviour
 {
-
     public List<FixedJoint> joints = new List<FixedJoint>();
     private Magnet magnet;
     public Player m_CurrentPlayer;
+
+    private GameObject startStone;
 
     private void Awake()
     {
@@ -21,6 +22,7 @@ public class Stone : MonoBehaviour
         Stone otherAttacher = collision.gameObject.GetComponent<Stone>();
         if (otherAttacher != null && !IsConnectedTo(otherAttacher.gameObject))
         {
+            startStone = this.gameObject;
             AttachObject(otherAttacher.gameObject);
             StartCoroutine(collision.gameObject.GetComponent<Magnet>().PullStones());
         }
@@ -55,4 +57,38 @@ public class Stone : MonoBehaviour
         return joints.Exists(j => j.connectedBody.gameObject == obj);
     }
 
+    public List<GameObject> CountConnectedObjects()
+    {
+        HashSet<GameObject> visitedObjects = new HashSet<GameObject>();
+        Queue<GameObject> objectsToCheck = new Queue<GameObject>();
+
+        objectsToCheck.Enqueue(startStone);
+        visitedObjects.Add(startStone);
+
+        while (objectsToCheck.Count > 0)
+        {
+            GameObject currentObject = objectsToCheck.Dequeue();
+            FixedJoint[] joints = currentObject.GetComponents<FixedJoint>();
+
+            foreach (FixedJoint joint in joints)
+            {
+                if (joint.connectedBody != null)
+                {
+                    GameObject connectedObject = joint.connectedBody.gameObject;
+                    if (!visitedObjects.Contains(connectedObject))
+                    {
+                        objectsToCheck.Enqueue(connectedObject);
+                        visitedObjects.Add(connectedObject);
+                    }
+                }
+            }
+        }
+
+        return new List<GameObject>(visitedObjects);
+    }
+
+    private bool CheckOtherStone(HashSet<GameObject> stones)
+    {
+        
+    }
 }

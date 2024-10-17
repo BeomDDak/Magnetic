@@ -26,6 +26,7 @@ public partial class BackendMatchManager : MonoBehaviour
         Backend.Match.OnMatchMakingRoomCreate += (args) =>
         {
             Debug.Log("OnMatchMakingRoomCreate : " + args.ErrInfo + " : " + args.Reason);
+            RequestMatchMaking();
         };
 
         Backend.Match.OnMatchMakingResponse += (args) =>
@@ -34,6 +35,64 @@ public partial class BackendMatchManager : MonoBehaviour
             // 매칭 신청 관련 작업에 대한 호출
             ProcessMatchMakingResponse(args);
         };
+
+        Backend.Match.OnSessionJoinInServer += (args) =>
+        {
+            Debug.Log("OnSessionJoinInServer : " + args.ErrInfo);
+            // 인게임 서버에 접속하면 호출
+            if (args.ErrInfo != ErrorInfo.Success)
+            {
+                if (isReconnectProcess)
+                {
+                    if (args.ErrInfo.Reason.Equals("Fail To Reconnect"))
+                    {
+                        Debug.Log("재접속 실패");
+                        JoinMatchServer();
+                        isConnectInGameServer = false;
+                    }
+                }
+                return;
+            }
+
+            if (isJoinGameRoom)
+            {
+                return;
+            }
+
+            if (inGameRoomToken == string.Empty)
+            {
+                Debug.LogError("인게임 서버 접속 성공했으나 룸 토큰이 없습니다.");
+                return;
+            }
+
+            Debug.Log("인게임 서버 접속 성공");
+            isJoinGameRoom = true;
+            AccessInGameRoom(inGameRoomToken);
+        };
+
+        Backend.Match.OnSessionListInServer += (args) =>
+        {
+            // 세션 리스트 호출 후 조인 채널이 호출됨
+            // 현재 같은 게임(방)에 참가중인 플레이어들 중 나보다 먼저 이 방에 들어와 있는 플레이어들과 나의 정보가 들어있다.
+            // 나보다 늦게 들어온 플레이어들의 정보는 OnMatchInGameAccess 에서 수신됨
+            Debug.Log("OnSessionListInServer : " + args.ErrInfo);
+
+            ProcessMatchInGameSessionList(args);
+        };
+
+        Backend.Match.OnMatchInGameAccess += (args) =>
+        {
+            Debug.Log("OnMatchInGameAccess : " + args.ErrInfo);
+            // 세션이 인게임 룸에 접속할 때마다 호출 (각 클라이언트가 인게임 룸에 접속할 때마다 호출됨)
+            ProcessMatchInGameAccess(args);
+        };
+
+        Backend.Match.OnMatchInGameStart += () =>
+        {
+            // 서버에서 게임 시작 패킷을 보내면 호출
+            SceneLoader.Instance.LoadScene(SceneType.InGame);
+        };
+
     }
 
     public void StartMatchmakingProcess()
@@ -93,6 +152,7 @@ public partial class BackendMatchManager : MonoBehaviour
         {
             // 접속 실패
             isConnectMatchServer = false;
+            Debug.Log(errInfo);
         }
 
         if (!isConnectMatchServer)
@@ -109,7 +169,7 @@ public partial class BackendMatchManager : MonoBehaviour
         }
     }
 
-    public void RequestMatchMaking(int index)
+    public void RequestMatchMaking()
     {
         // 매청 서버에 연결되어 있지 않으면 매칭 서버 접속
         if (!isConnectMatchServer)
@@ -122,7 +182,7 @@ public partial class BackendMatchManager : MonoBehaviour
         // 변수 초기화
         isConnectInGameServer = false;
 
-        Backend.Match.RequestMatchMaking(matchInfos[index].matchType, matchInfos[index].matchModeType, matchInfos[index].inDate);
+        Backend.Match.RequestMatchMaking(MatchType.Random, MatchModeType.OneOnOne, "2024-10-16T04:53:20.101Z");
         if (isConnectInGameServer)
         {
             Backend.Match.LeaveGameServer(); //인게임 서버 접속되어 있을 경우를 대비해 인게임 서버 리브 호출
@@ -269,6 +329,75 @@ public partial class BackendMatchManager : MonoBehaviour
         isConnectInGameServer = true;
         isJoinGameRoom = false;
         isReconnectProcess = true;
+    }
+
+    // 인게임 룸 접속
+    private void AccessInGameRoom(string roomToken)
+    {
+        Backend.Match.JoinGameRoom(roomToken);
+    }
+
+    // 현재 룸에 접속한 세션들의 정보
+    // 최초 룸에 접속했을 때 1회 수신됨
+    // 재접속 했을 때도 1회 수신됨
+    private void ProcessMatchInGameSessionList(MatchInGameSessionListEventArgs args)
+    {
+        sessionIdList = new List<SessionId>();
+        gameRecords = new Dictionary<SessionId, MatchUserGameRecord>();
+
+        foreach (var record in args.GameRecords)
+        {
+            sessionIdList.Add(record.m_sessionId);
+            gameRecords.Add(record.m_sessionId, record);
+        }
+        sessionIdList.Sort();
+    }
+
+    // 클라이언트 들의 게임 룸 접속에 대한 리턴값
+    // 클라이언트가 게임 룸에 접속할 때마다 호출됨
+    // 재접속 했을 때는 수신되지 않음
+    private void ProcessMatchInGameAccess(MatchInGameSessionEventArgs args)
+    {
+        if (isReconnectProcess)
+        {
+            // 재접속 프로세스 인 경우
+            // 이 메시지는 수신되지 않고, 만약 수신되어도 무시함
+            Debug.Log("재접속 프로세스 진행중... 재접속 프로세스에서는 ProcessMatchInGameAccess 메시지는 수신되지 않습니다.\n" + args.ErrInfo);
+            return;
+        }
+
+        Debug.Log(string.Format(SUCCESS_ACCESS_INGAME, args.ErrInfo));
+
+        if (args.ErrInfo != ErrorCode.Success)
+        {
+            // 게임 룸 접속 실패
+            var errorLog = string.Format(FAIL_ACCESS_INGAME, args.ErrInfo, args.Reason);
+            Debug.Log(errorLog);
+            LeaveInGameRoom();
+            return;
+        }
+
+        // 게임 룸 접속 성공
+        // 인자값에 방금 접속한 클라이언트(세션)의 세션ID와 매칭 기록이 들어있다.
+        // 세션 정보는 누적되어 들어있기 때문에 이미 저장한 세션이면 건너뛴다.
+
+        var record = args.GameRecord;
+        Debug.Log(string.Format(string.Format("인게임 접속 유저 정보 [{0}] : {1}", args.GameRecord.m_sessionId, args.GameRecord.m_nickname)));
+        if (!sessionIdList.Contains(args.GameRecord.m_sessionId))
+        {
+            // 세션 정보, 게임 기록 등을 저장
+            sessionIdList.Add(record.m_sessionId);
+            gameRecords.Add(record.m_sessionId, record);
+
+            Debug.Log(string.Format(NUM_INGAME_SESSION, sessionIdList.Count));
+        }
+    }
+
+    // 인게임 서버 접속 종료
+    public void LeaveInGameRoom()
+    {
+        isConnectInGameServer = false;
+        Backend.Match.LeaveGameServer();
     }
 
     // 매칭 대기 방 나가기
