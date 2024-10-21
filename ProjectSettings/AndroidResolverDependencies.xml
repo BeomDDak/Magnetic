@@ -39,8 +39,8 @@
     <file>Assets/Plugins/Android/com.google.games.gpgs-plugin-support-0.11.01.aar</file>
   </files>
   <settings>
-    <setting name="androidAbis" value="arm64-v8a,armeabi-v7a,x86" />
-    <setting name="bundleId" value="com.BeomDDak.Magnetic" />
+    <setting name="androidAbis" value="arm64-v8a,armeabi-v7a" />
+    <setting name="bundleId" value="com.BeomDDak_1.Magnetic_1" />
     <setting name="explodeAars" value="True" />
     <setting name="gradleBuildEnabled" value="True" />
     <setting name="gradlePropertiesTemplateEnabled" value="False" />

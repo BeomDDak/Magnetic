@@ -87,8 +87,4 @@ public class Stone : MonoBehaviour
         return new List<GameObject>(visitedObjects);
     }
 
-    private bool CheckOtherStone(HashSet<GameObject> stones)
-    {
-        
-    }
 }

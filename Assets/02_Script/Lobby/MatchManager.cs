@@ -95,6 +95,13 @@ public partial class BackendMatchManager : MonoBehaviour
 
     }
 
+    public void GetMatchList()
+    {
+        Backend.Match.GetMatchList();
+        Debug.Log(Backend.Match.GetMatchList());
+        StartMatchmakingProcess();
+    }
+
     public void StartMatchmakingProcess()
     {
         // 1. GetMatchList 매치 리스트 불러오기
@@ -212,7 +219,6 @@ public partial class BackendMatchManager : MonoBehaviour
                 if (args.Reason == string.Empty)
                 {
                     debugLog = SUCCESS_REGIST_MATCHMAKE;
-
                     // LobbyUI.GetInstance().MatchRequestCallback(true);
                 }
                 break;
