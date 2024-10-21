@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GooglePlayGames;
-using GooglePlayGames.BasicApi;
+//using GooglePlayGames;
+//using GooglePlayGames.BasicApi;
 
 public class GoogleManager : Singleton<GoogleManager>
 {
-    public void GoogleLogin()
+    /*public void GoogleLogin()
     {
         PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
     }
@@ -27,5 +27,5 @@ public class GoogleManager : Singleton<GoogleManager>
     {
         yield return new WaitForSeconds(1f);
         SceneLoader.Instance.LoadScene(SceneType.Lobby);
-    }
+    }*/
 }

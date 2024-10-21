@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using BackEnd;
-using GooglePlayGames.BasicApi;
-using GooglePlayGames;
+//using GooglePlayGames.BasicApi;
+//using GooglePlayGames;
 
 public class TitleManager : MonoBehaviour
 {

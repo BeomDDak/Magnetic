@@ -16,26 +16,31 @@ public partial class BackendMatchManager : MonoBehaviour
 
     private void MatchMakingHandler()
     {
+        // 순서 3. 매치서버 접속 확인
         Backend.Match.OnJoinMatchMakingServer += (args) =>
         {
             Debug.Log("OnJoinMatchMakingServer : " + args.ErrInfo);
-            // 매칭 서버에 접속하면 호출
+            // 순서 3-1. 확인 후 함수 호출
             ProcessAccessMatchMakingServer(args.ErrInfo);
         };
 
+        // 순서 5. 매치 룸 만들기 확인
         Backend.Match.OnMatchMakingRoomCreate += (args) =>
         {
             Debug.Log("OnMatchMakingRoomCreate : " + args.ErrInfo + " : " + args.Reason);
+            // 순서 5-1. 매치 요청 함수 호출
             RequestMatchMaking();
         };
 
+        // 순서 7. 매치 접속 확인
         Backend.Match.OnMatchMakingResponse += (args) =>
         {
             Debug.Log("OnMatchMakingResponse : " + args.ErrInfo + " : " + args.Reason);
-            // 매칭 신청 관련 작업에 대한 호출
+            // 순서 7-1. 매칭 신청 관련 작업에 대한 호출
             ProcessMatchMakingResponse(args);
         };
 
+        // 순서 10. 인게임 서버 접속 확인
         Backend.Match.OnSessionJoinInServer += (args) =>
         {
             Debug.Log("OnSessionJoinInServer : " + args.ErrInfo);
@@ -67,9 +72,11 @@ public partial class BackendMatchManager : MonoBehaviour
 
             Debug.Log("인게임 서버 접속 성공");
             isJoinGameRoom = true;
+            // 순서 10-1. 인게임 서버 접속 성공시, 인게임 룸 함수 호출
             AccessInGameRoom(inGameRoomToken);
         };
 
+        // 순서 12. 인게임 룸 입장시, 접속자 확인
         Backend.Match.OnSessionListInServer += (args) =>
         {
             // 세션 리스트 호출 후 조인 채널이 호출됨
@@ -77,6 +84,7 @@ public partial class BackendMatchManager : MonoBehaviour
             // 나보다 늦게 들어온 플레이어들의 정보는 OnMatchInGameAccess 에서 수신됨
             Debug.Log("OnSessionListInServer : " + args.ErrInfo);
 
+            // 순서 12-1. 인게임 접속자 확인하는 함수 호출
             ProcessMatchInGameSessionList(args);
         };
 
@@ -87,6 +95,7 @@ public partial class BackendMatchManager : MonoBehaviour
             ProcessMatchInGameAccess(args);
         };
 
+        // 순서 14. 매치 시작
         Backend.Match.OnMatchInGameStart += () =>
         {
             // 서버에서 게임 시작 패킷을 보내면 호출
@@ -95,26 +104,14 @@ public partial class BackendMatchManager : MonoBehaviour
 
     }
 
-    public void GetMatchList()
-    {
-        Backend.Match.GetMatchList();
-        Debug.Log(Backend.Match.GetMatchList());
-        StartMatchmakingProcess();
-    }
-
+    // 버튼에 연결
     public void StartMatchmakingProcess()
     {
-        // 1. GetMatchList 매치 리스트 불러오기
-        /*var callback = Backend.Match.GetMatchList();
-
+        // 순서 1. 매치리스트의 정보를 가져오기
         Backend.Match.GetMatchList();
-        if (!callback.IsSuccess())
-        {
-            Debug.LogError("Backend.Match.GetMatchList Error : " + callback);
-            return;
-        }
-
-        Debug.Log("매치 리스트 불러오기 성공");*/
+        Debug.Log(Backend.Match.GetMatchList());
+        Debug.Log("매치 리스트 불러오기 성공");
+        // 순서 2. 매치 리스트를 불러오면 매치메이킹 서버 접속 요청
         JoinMatchServer();
     }
 
@@ -129,27 +126,13 @@ public partial class BackendMatchManager : MonoBehaviour
         ErrorInfo errorInfo;
         isConnectMatchServer = true;
 
-        if(!Backend.Match.JoinMatchMakingServer(out errorInfo))
+        // 2-1. 매치 서버에 접속 -> 서버에서 확인 받아야됨.
+        if (!Backend.Match.JoinMatchMakingServer(out errorInfo))
         {
             Debug.Log("매치메이킹 서버 접속 요청 실패 : " + errorInfo);
         }
 
         Debug.Log("매치메이킹 서버 접속 요청 성공");
-    }
-
-    private bool CreateMatchRoom()
-    {
-        // 매칭 서버에 연결되어 있지 않으면 매칭 서버 접속
-        if (!isConnectMatchServer)
-        {
-            Debug.Log("매치 서버에 연결되어 있지 않습니다.");
-            Debug.Log("매치 서버에 접속을 시도합니다.");
-            JoinMatchServer();
-            return false;
-        }
-        Debug.Log("방 생성 요청을 서버로 보냄");
-        Backend.Match.CreateMatchRoom();
-        return true;
     }
 
     // 매칭 서버 접속에 대한 리턴값
@@ -172,8 +155,25 @@ public partial class BackendMatchManager : MonoBehaviour
         {
             //접속 성공
             Debug.Log("매치 서버 접속 성공");
+            // 4. 매치 서버에 접속 성공했다면 매치 룸 만드는 함수 호출
             CreateMatchRoom();
         }
+    }
+
+    private bool CreateMatchRoom()
+    {
+        // 매칭 서버에 연결되어 있지 않으면 매칭 서버 접속
+        if (!isConnectMatchServer)
+        {
+            Debug.Log("매치 서버에 연결되어 있지 않습니다.");
+            Debug.Log("매치 서버에 접속을 시도합니다.");
+            JoinMatchServer();
+            return false;
+        }
+        Debug.Log("방 생성 요청을 서버로 보냄");
+        // 4-1. 매치 룸 만들기 -> 서버에 확인 받아야됨.
+        Backend.Match.CreateMatchRoom();
+        return true;
     }
 
     public void RequestMatchMaking()
@@ -189,6 +189,7 @@ public partial class BackendMatchManager : MonoBehaviour
         // 변수 초기화
         isConnectInGameServer = false;
 
+        // 순서 6. 1번에서 받은 매치 리스트중 하나의 정보를 이용하여 매치 요청 -> 서버에 확인 받아야됨.
         Backend.Match.RequestMatchMaking(MatchType.Random, MatchModeType.OneOnOne, "2024-10-16T04:53:20.101Z");
         if (isConnectInGameServer)
         {
@@ -210,6 +211,8 @@ public partial class BackendMatchManager : MonoBehaviour
                 // 매칭 성공했을 때
                 debugLog = string.Format(SUCCESS_MATCHMAKE, args.Reason);
                 // LobbyUI.GetInstance().MatchDoneCallback();
+
+                // 순서 8. 매칭이 성공 하면 호출하는 함수
                 ProcessMatchSuccess(args);
                 break;
             case ErrorCode.Match_InProgress:
@@ -285,6 +288,7 @@ public partial class BackendMatchManager : MonoBehaviour
             sessionIdList.Clear();
         }
 
+        // 순서 9. 인게임 서버 접속 -> 서버에 확인 받아야됨.
         if (!Backend.Match.JoinGameServer(args.RoomInfo.m_inGameServerEndPoint.m_address, args.RoomInfo.m_inGameServerEndPoint.m_port, false, out errorInfo))
         {
             var debugLog = string.Format(FAIL_ACCESS_INGAME, errorInfo.ToString(), string.Empty);
@@ -340,14 +344,15 @@ public partial class BackendMatchManager : MonoBehaviour
     // 인게임 룸 접속
     private void AccessInGameRoom(string roomToken)
     {
+        // 순서 11. 인게임 룸 입장 -> 서버에 확인 받아야됨
         Backend.Match.JoinGameRoom(roomToken);
     }
 
-    // 현재 룸에 접속한 세션들의 정보
-    // 최초 룸에 접속했을 때 1회 수신됨
-    // 재접속 했을 때도 1회 수신됨
     private void ProcessMatchInGameSessionList(MatchInGameSessionListEventArgs args)
     {
+        // 순서 13. 현재 룸에 접속한 세션들의 정보
+        // 최초 룸에 접속했을 때 1회 수신됨
+        // 재접속 했을 때도 1회 수신됨 -> 매치 시작 서버에 확인 받아야됨.
         sessionIdList = new List<SessionId>();
         gameRecords = new Dictionary<SessionId, MatchUserGameRecord>();
 
