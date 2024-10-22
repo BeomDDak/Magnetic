@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 7215397983639234582}
   - component: {fileID: 8234271043617113149}
   - component: {fileID: 7474945547111420531}
+  - component: {fileID: -8389925711867596477}
+  - component: {fileID: 5985663557639935781}
   m_Layer: 8
   m_Name: Donut
   m_TagString: Untagged
@@ -134,3 +136,33 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -2712910405818149345, guid: dfb39248011bc5c48b7bb365ac5b5a6b, type: 3}
+--- !u!114 &-8389925711867596477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3389209937189992045}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42525e98d1f353442b0f74c575dda17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  magnetRange: 0
+  magnetMaxForce: 0
+  magnetTime: 0
+  cling: 0
+--- !u!114 &5985663557639935781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3389209937189992045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af3cda2732f99b4293332100de1a4e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  joints: []
+  m_CurrentPlayer: 0

@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 1907435174570377095}
   - component: {fileID: 2816462504593244371}
   - component: {fileID: -1752667091277972142}
+  - component: {fileID: 5259183308805243805}
+  - component: {fileID: 5164307103476683424}
   m_Layer: 8
   m_Name: CoffeCup
   m_TagString: Untagged
@@ -134,3 +136,33 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -1016011637710242029, guid: 5e87ddfd4564feb4689769f649055178, type: 3}
+--- !u!114 &5259183308805243805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216247908639417938}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42525e98d1f353442b0f74c575dda17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  magnetRange: 0
+  magnetMaxForce: 0
+  magnetTime: 0
+  cling: 0
+--- !u!114 &5164307103476683424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216247908639417938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af3cda2732f99b4293332100de1a4e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  joints: []
+  m_CurrentPlayer: 0

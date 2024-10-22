@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 6255948182208720340}
   - component: {fileID: 2689824667837584802}
   - component: {fileID: 1011309726577124030}
+  - component: {fileID: 5225944590434198349}
+  - component: {fileID: 7891666125093507117}
   m_Layer: 8
   m_Name: Apple
   m_TagString: Untagged
@@ -134,3 +136,33 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -472147775963580301, guid: 12bf7c0de8c3b5b4bb67f4f585d5a093, type: 3}
+--- !u!114 &5225944590434198349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7172130073301068996}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42525e98d1f353442b0f74c575dda17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  magnetRange: 0
+  magnetMaxForce: 0
+  magnetTime: 0
+  cling: 0
+--- !u!114 &7891666125093507117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7172130073301068996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af3cda2732f99b4293332100de1a4e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  joints: []
+  m_CurrentPlayer: 0

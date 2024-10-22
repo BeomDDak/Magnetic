@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 1589569017968574942}
   - component: {fileID: 7132153130105146110}
   - component: {fileID: 6627269893298307888}
+  - component: {fileID: 1579807384517618757}
+  - component: {fileID: 4938189836799892679}
   m_Layer: 8
   m_Name: Mushroom
   m_TagString: Untagged
@@ -134,3 +136,33 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 7682724294687611154, guid: 0dea975dd1211a249a51235128b881d6, type: 3}
+--- !u!114 &1579807384517618757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5540089440332938754}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42525e98d1f353442b0f74c575dda17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  magnetRange: 0
+  magnetMaxForce: 0
+  magnetTime: 0
+  cling: 0
+--- !u!114 &4938189836799892679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5540089440332938754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af3cda2732f99b4293332100de1a4e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  joints: []
+  m_CurrentPlayer: 0

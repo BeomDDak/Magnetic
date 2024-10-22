@@ -96,8 +96,7 @@ public class Landing : MonoBehaviour
 
         Debug.Log($"플레이어 : {gameManager.CurrentPlayer} 남은돌 : {playerManager.stoneCount[gameManager.CurrentPlayer]}");
 
-        pullStone.AddComponent<Magnet>();
-        pullStone.AddComponent<Stone>();
+        pullStone.GetComponent<Magnet>().enabled = true;
         pullStone.GetComponent<Stone>().m_CurrentPlayer = gameManager.CurrentPlayer;
         
         gameManager.CurrentPlayerState = PlayerState.Wait;

@@ -50,6 +50,7 @@ public class Stone : MonoBehaviour
         magnet.magnetRange += 0.2f;
         magnet.magnetMaxForce += 0.1f;
 
+        // 붙었다면 오브젝트 확인
         magnet.cling = true;
     }
 

@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2162089329572089003}
   - component: {fileID: 2495179265116009809}
   - component: {fileID: 8603669075668283676}
+  - component: {fileID: -2485890754471264685}
+  - component: {fileID: 8894465277430980247}
   m_Layer: 8
   m_Name: Pumpkin
   m_TagString: Untagged
@@ -134,3 +136,33 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -3339082285309697363, guid: 01a647d07ea2c9544a4ebba6208c2ed3, type: 3}
+--- !u!114 &-2485890754471264685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2048921511522729583}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42525e98d1f353442b0f74c575dda17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  magnetRange: 0
+  magnetMaxForce: 0
+  magnetTime: 0
+  cling: 0
+--- !u!114 &8894465277430980247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2048921511522729583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8af3cda2732f99b4293332100de1a4e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  joints: []
+  m_CurrentPlayer: 0

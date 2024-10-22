@@ -14,28 +14,24 @@ public class Magnet : MonoBehaviour
     private Vector3 center;
     private int canClingLayer;
     public bool cling;
+    private bool isSwitchTurn;
     
 
     private void Awake()
     {
+        m_stone = GetComponent<Stone>();
         canClingLayer = 1 << 8;
-        this.GetComponent<Magnet>().enabled = false;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void Start()
     {
-
-        if (collision.collider.CompareTag("Board"))
-        {
-            this.gameObject.GetComponent<Magnet>().enabled = true;
-            m_stone = GetComponent<Stone>();
-            center = GameManager.Instance.landing.landingPoint;
-            StartCoroutine(PullStones());
-        }
+        center = GameManager.Instance.landing.landingPoint;
+        StartCoroutine(PullStones());
     }
 
     public IEnumerator PullStones()
     {
+        
         Debug.Log("풀스톤 시작");
 
         magnetRange = 0.5f;
@@ -45,10 +41,11 @@ public class Magnet : MonoBehaviour
         Collider[] anyStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
        
 
-        if (anyStones.Length == 1)
+        if (anyStones.Length == 0)
         {
             Debug.Log("주변에 돌이 없습니다. 턴을 종료합니다.");
             GameManager.Instance.SwitchTurn();
+            GetComponent<Magnet>().enabled = false;
             yield break;
         }
 
@@ -79,6 +76,8 @@ public class Magnet : MonoBehaviour
 
                 // 상대방 플레이어의 돌 갯수 증가
                 GameManager.Instance.playerManager.IncrementStoneCount(m_stone.CountConnectedObjects().Count, opponentPlayer);
+                Debug.Log($"붙은갯수:{m_stone.CountConnectedObjects().Count} 추가되는 곳:{opponentPlayer}");
+                Debug.Log(GameManager.Instance.playerManager.stoneCount);
 
                 for (int i = 0; i < m_stone.CountConnectedObjects().Count; i++)
                 {
@@ -88,8 +87,12 @@ public class Magnet : MonoBehaviour
                 this.gameObject.SetActive(false);
             }
         }
-        cling = false;
-        GameManager.Instance.SwitchTurn();
+
+        if (!isSwitchTurn)
+        {
+            GameManager.Instance.SwitchTurn();
+            isSwitchTurn = true;
+        }
         GetComponent<Magnet>().enabled = false;
     }
 
@@ -102,7 +105,9 @@ public class Magnet : MonoBehaviour
     {
         foreach (GameObject stone in m_stone.CountConnectedObjects())
         {
-            if (stone.GetComponent<Stone>().m_CurrentPlayer != GameManager.Instance.CurrentPlayer)
+            var stonePlayer = stone.GetComponent<Stone>().m_CurrentPlayer;
+
+            if (stonePlayer != GameManager.Instance.CurrentPlayer)
             {
                 return true;
             }
