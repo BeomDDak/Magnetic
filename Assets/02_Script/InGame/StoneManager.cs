@@ -6,17 +6,17 @@ using static Define;
 public class StoneManager : MonoBehaviour
 {
     [SerializeField]
-    private GameObject[] StoneTypes;                        // 돌 종류
-    public GameObject[] _stoneTypes                         // 돌 종류는 다른곳에서는 접근 하지 못하게 하려고 만든 프로퍼티
+    private GameObject[] StoneTypes;   // 돌 종류
+    public GameObject[] _stoneTypes    // 돌 종류는 다른곳에서는 접근 하지 못하게 하려고 만든 프로퍼티
     {   
         get { return StoneTypes; } 
         private set { StoneTypes = value; }
     }
 
-    public GameObject landingStone;     // 돌 ( 착수되기 전 보여줄 오브젝트 )
-    public int stoneTypesCount { get; private set; }         // 돌 종류 갯수 ( 돌 랜덤값 뽑기 위해 )
-    public List<int> stoneIndex { get; private set; } = new List<int>();           // 플레이어가 사용하는 돌의 인덱스를 저장
-    public Collider stoneColl { get; set; }                  // 콜라이더
+    public GameObject landingStone;    // 돌 ( 착수되기 전 보여줄 오브젝트 )
+    public int stoneTypesCount { get; private set; }  // 돌 종류 갯수 ( 돌 랜덤값 뽑기 위해 )
+    public List<int> stoneIndex { get; private set; } = new List<int>(); // 플레이어가 사용하는 돌의 인덱스를 저장
+    public Collider stoneColl { get; set; }
     GameManager gameManager;
 
     private void Awake()

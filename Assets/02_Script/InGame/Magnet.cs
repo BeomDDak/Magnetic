@@ -8,14 +8,13 @@ public class Magnet : MonoBehaviour
 {
     Stone m_stone;
 
-    public float magnetRange;
-    public float magnetMaxForce;
-    public float magnetTime;
-    private Vector3 center;
-    private int canClingLayer;
-    public bool cling;
-    private bool isSwitchTurn;
-    
+    public float magnetRange;       // 자성 범위
+    public float magnetMaxForce;    // 자성 파워
+    public float magnetTime;        // 자성 시간
+    private Vector3 center;         // 돌의 중심점 (끌어당길 중심점)
+    private int canClingLayer;      // 끌어 당길 수 있는 레이어
+    public bool cling;              // 다른 돌과 부딪혔는지 판단
+    private bool isSwitchTurn;      // 턴 교체 중인지 판단 (충돌하거나 연결될 시 여러 스톤에서 중복 호출 발생된 것을 확인)
 
     private void Awake()
     {
@@ -31,7 +30,6 @@ public class Magnet : MonoBehaviour
 
     public IEnumerator PullStones()
     {
-        
         Debug.Log("풀스톤 시작");
 
         magnetRange = 0.5f;
