@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using static Define;
+using BackEnd;
+using BackEnd.Tcp;
 
 public class GameManager : Singleton<GameManager>
 {
@@ -22,11 +24,13 @@ public class GameManager : Singleton<GameManager>
     public Action OnStartGame;
     public Action OnGame;
 
-    
+    private Camera cam;
+    private GameObject[] camPosition;
     protected override void Init()
     {
         base.Init();
         InitializeManagers();
+        cam = Camera.main;
     }
 
     // 매니저 초기설정
@@ -40,6 +44,7 @@ public class GameManager : Singleton<GameManager>
     private void Start()
     {
         StartGame();
+        //CameraPosition();
     }
 
     // 게임 시작시 해줄 작업
@@ -48,6 +53,7 @@ public class GameManager : Singleton<GameManager>
         CurrentState = GameState.Playing;
         CurrentPlayer = Player.One;         // 1플레이어 부터 시작하기 위해서
         CurrentPlayerState = PlayerState.PlayTime;
+        Debug.Log("현재 차례 : " + CurrentPlayer);
     }
     
     // 게임 끝날시 해줄 작업
@@ -60,11 +66,24 @@ public class GameManager : Singleton<GameManager>
     // 턴 변경
     public void SwitchTurn()
     {
-        Debug.Log("현재 차례 : " + CurrentPlayer);
         CurrentPlayer = (CurrentPlayer == Player.One) ? Player.Two : Player.One;
-        Debug.Log("Turn switched. New current player: " + CurrentPlayer);
         CurrentPlayerState = PlayerState.PlayTime;
+        Debug.Log("현재 차례 : " + CurrentPlayer);
         //OnTurnChanged?.Invoke(CurrentPlayer);
+    }
+
+    // 카메라
+    private void CameraPosition()
+    {
+        var player = BackendMatchManager.Instance.sessionIdList[0];
+        if(player == BackendMatchManager.Instance.sessionIdList[0])
+        {
+            cam.transform.parent = camPosition[0].transform;
+        }
+        else
+        {
+            cam.transform.parent = camPosition[1].transform;
+        }
     }
 
     private void Update()

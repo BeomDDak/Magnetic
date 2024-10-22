@@ -4,10 +4,11 @@ using UnityEngine;
 using BackEnd;
 using BackEnd.Tcp;
 
-public partial class BackendMatchManager : MonoBehaviour
+public partial class BackendMatchManager : Singleton<BackendMatchManager>
 {
     private string gameRoomToken = string.Empty;
     private List<MatchInGameRoomInfo> matchList;
+    private List<uint> playerList = new List<uint>();
 
     private void Start()
     {
@@ -83,6 +84,7 @@ public partial class BackendMatchManager : MonoBehaviour
             // 현재 같은 게임(방)에 참가중인 플레이어들 중 나보다 먼저 이 방에 들어와 있는 플레이어들과 나의 정보가 들어있다.
             // 나보다 늦게 들어온 플레이어들의 정보는 OnMatchInGameAccess 에서 수신됨
             Debug.Log("OnSessionListInServer : " + args.ErrInfo);
+            Debug.Log(args);
 
             // 순서 12-1. 인게임 접속자 확인하는 함수 호출
             ProcessMatchInGameSessionList(args);
@@ -99,9 +101,15 @@ public partial class BackendMatchManager : MonoBehaviour
         Backend.Match.OnMatchInGameStart += () =>
         {
             // 서버에서 게임 시작 패킷을 보내면 호출
-            SceneLoader.Instance.LoadScene(SceneType.InGame);
+            LobbyUIManager.energy -= 1;
+            StartCoroutine(StartInGame());
         };
+    }
 
+    IEnumerator StartInGame()
+    {
+        yield return new WaitForSeconds(1f);
+        SceneLoader.Instance.LoadScene(SceneType.InGame);
     }
 
     // 버튼에 연결
@@ -176,7 +184,7 @@ public partial class BackendMatchManager : MonoBehaviour
         return true;
     }
 
-    public void RequestMatchMaking()
+    private void RequestMatchMaking()
     {
         // 매청 서버에 연결되어 있지 않으면 매칭 서버 접속
         if (!isConnectMatchServer)
@@ -362,6 +370,8 @@ public partial class BackendMatchManager : MonoBehaviour
             gameRecords.Add(record.m_sessionId, record);
         }
         sessionIdList.Sort();
+        Debug.Log(sessionIdList[0].ToString());
+        Debug.Log(sessionIdList[1].ToString());
     }
 
     // 클라이언트 들의 게임 룸 접속에 대한 리턴값
@@ -399,9 +409,10 @@ public partial class BackendMatchManager : MonoBehaviour
             // 세션 정보, 게임 기록 등을 저장
             sessionIdList.Add(record.m_sessionId);
             gameRecords.Add(record.m_sessionId, record);
-
+            
             Debug.Log(string.Format(NUM_INGAME_SESSION, sessionIdList.Count));
         }
+        
     }
 
     // 인게임 서버 접속 종료

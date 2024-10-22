@@ -5,7 +5,7 @@ using BackEnd;
 using BackEnd.Tcp;
 using System.Linq;
 
-public partial class BackendMatchManager : MonoBehaviour
+public partial class BackendMatchManager : Singleton<BackendMatchManager>
 {
     public class MatchInfo
     {

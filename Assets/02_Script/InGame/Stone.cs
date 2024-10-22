@@ -24,7 +24,7 @@ public class Stone : MonoBehaviour
         {
             startStone = this.gameObject;
             AttachObject(otherAttacher.gameObject);
-            StartCoroutine(collision.gameObject.GetComponent<Magnet>().PullStones());
+            //StartCoroutine(collision.gameObject.GetComponent<Magnet>().PullStones());
         }
     }
 
@@ -50,6 +50,7 @@ public class Stone : MonoBehaviour
         magnet.magnetRange += 0.2f;
         magnet.magnetMaxForce += 0.1f;
 
+        magnet.cling = true;
     }
 
     private bool IsConnectedTo(GameObject obj)
@@ -83,8 +84,6 @@ public class Stone : MonoBehaviour
                 }
             }
         }
-
         return new List<GameObject>(visitedObjects);
     }
-
 }
