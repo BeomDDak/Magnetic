@@ -3,9 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using static Define;
+using BackEnd;
+using BackEnd.Tcp;
+using System;
+using Protocol;
 
 public class Landing : MonoBehaviour
 {
+    // 메시지 타입 정의
+    private enum GameMessageType
+    {
+        StonePlacement = 0,
+        GameState = 1
+    }
+
     // 필요한 매니저
     private StoneManager stoneManager;
     private PlayerManager playerManager;
@@ -19,24 +30,27 @@ public class Landing : MonoBehaviour
         InitManager();
     }
 
-    private void Start()
-    {
-        gameManager.OnGame += StartLanding;
-    }
-
+    #region 매니저 초기화
     private void InitManager()
     {
         playerManager = GetComponent<PlayerManager>();
         stoneManager = GetComponent<StoneManager>();
         gameManager = GetComponent<GameManager>();
     }
+    #endregion
+
+    private void Start()
+    {
+        gameManager.OnGame += StartLanding;
+        //Backend.Match.OnMatchInGameAccess = OnMatchInGameAccess;
+    }
 
     private void StartLanding()
     {
-        // 현재 플레이어의 랜딩 시작
-        if(playerManager.stoneCount.Any(pair => pair.Value == 0))
+        if (playerManager.stoneCount.Any(pair => pair.Value < -1))
         {
             gameManager.CurrentState = GameState.GameOver;
+            return;
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -71,35 +85,38 @@ public class Landing : MonoBehaviour
         }
     }
 
+    public void ProcessStonePlacement(StonePlacementMessage msg)
+    {
+        Vector3 position = new Vector3(msg.posX, msg.posY, msg.posZ);
+
+        // 돌 생성 및 설정
+        GameObject pullStone = Instantiate(
+            stoneManager._stoneTypes[msg.stoneIndex],
+            position,
+            Quaternion.identity
+        );
+
+        Player currentPlayer = (Player)Enum.Parse(typeof(Player), msg.player);
+        playerManager.DecrementStoneCount(currentPlayer);
+        pullStone.GetComponent<Magnet>().enabled = true;
+        pullStone.GetComponent<Stone>().m_CurrentPlayer = currentPlayer;
+
+        Debug.Log($"플레이어 : {currentPlayer} 남은돌 : {playerManager.stoneCount[currentPlayer]}");
+        gameManager.CurrentPlayerState = PlayerState.Wait;
+    }
+
     private void LandingPointStone()
     {
         // 마우스를 왼쪽클릭을 놓으면 해당자리에서 y축으로 1만큼 위에서 떨어짐
-        Vector3 originlandingPoint;
-        originlandingPoint = stoneManager.landingStone.transform.position;
+        Vector3 originlandingPoint = stoneManager.landingStone.transform.position;
         originlandingPoint.y += 1f;
-        stoneManager.landingStone.transform.position = originlandingPoint;
 
-        GameObject pullStone;       // 실제 보드판 위에 생성될 돌
+        StonePlacementMessage placementMsg = new StonePlacementMessage(
+            originlandingPoint,
+            gameManager.CurrentPlayer == Player.One ? stoneManager.stoneIndex[0] : stoneManager.stoneIndex[1],
+            gameManager.CurrentPlayer.ToString()
+        );
 
-        if (gameManager.CurrentPlayer == Player.One)
-        {
-            pullStone = Instantiate(stoneManager._stoneTypes[stoneManager.stoneIndex[0]], 
-                stoneManager.landingStone.transform.position, Quaternion.identity);
-        }
-        else
-        {
-            pullStone = Instantiate(stoneManager._stoneTypes[stoneManager.stoneIndex[1]], 
-                stoneManager.landingStone.transform.position, Quaternion.identity);
-        }
-
-        playerManager.DecrementStoneCount(gameManager.CurrentPlayer);
-
-        Debug.Log($"플레이어 : {gameManager.CurrentPlayer} 남은돌 : {playerManager.stoneCount[gameManager.CurrentPlayer]}");
-
-        pullStone.GetComponent<Magnet>().enabled = true;
-        pullStone.GetComponent<Stone>().m_CurrentPlayer = gameManager.CurrentPlayer;
-        
-        gameManager.CurrentPlayerState = PlayerState.Wait;
-
+        BackendMatchManager.Instance.SendDataToInGame(placementMsg);
     }
 }

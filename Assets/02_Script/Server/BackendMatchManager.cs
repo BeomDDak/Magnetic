@@ -51,10 +51,11 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
     public bool isReconnectProcess { get; private set; } = false;
     public bool isSandBoxGame { get; private set; } = false;
 
-    private int numOfClient = 2;                    // 매치에 참가한 유저의 총 수
-
     public MatchType nowMatchType { get; private set; } = MatchType.None;     // 현재 선택된 매치 타입
     public MatchModeType nowModeType { get; private set; } = MatchModeType.None; // 현재 선택된 매치 모드 타입
+
+    private bool isHost = false;       // 호스트 여부 (서버에서 설정한 SuperGamer 정보를 가져옴)
+    private bool isSetHost = false;    // 호스트 세션 결정했는지 여부
 
     // 디버그 로그
     private string NOTCONNECT_MATCHSERVER = "매치 서버에 연결되어 있지 않습니다.";
@@ -82,6 +83,36 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
             return null;
         }
         return result;
+    }
+
+    private bool SetHostSession()
+    {
+        // 호스트 세션 정하기
+        // 각 클라이언트가 모두 수행 (호스트 세션 정하는 로직은 모두 같으므로 각각의 클라이언트가 모두 로직을 수행하지만 결과값은 같다.)
+
+        Debug.Log("호스트 세션 설정 진입");
+        // 호스트 세션 정렬 (각 클라이언트마다 입장 순서가 다를 수 있기 때문에 정렬)
+        sessionIdList.Sort();
+        isHost = false;
+        // 내가 호스트 세션인지
+        foreach (var record in gameRecords)
+        {
+            if (record.Value.m_isSuperGamer == true)
+            {
+                if (record.Value.m_sessionId.Equals(Backend.Match.GetMySessionId()))
+                {
+                    isHost = true;
+                }
+                hostSession = record.Value.m_sessionId;
+                break;
+            }
+        }
+
+        Debug.Log("호스트 여부 : " + isHost);
+
+        // 호스트 설정까지 끝나면 매치서버와 접속 끊음
+        LeaveMatchServer();
+        return true;
     }
 
     void Update()

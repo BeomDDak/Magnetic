@@ -38,7 +38,6 @@ public class Magnet : MonoBehaviour
 
         Collider[] anyStones = Physics.OverlapSphere(center, magnetRange, canClingLayer);
        
-
         if (anyStones.Length == 0)
         {
             Debug.Log("주변에 돌이 없습니다. 턴을 종료합니다.");

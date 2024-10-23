@@ -1,3 +1,4 @@
+using Protocol;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,6 +25,8 @@ public class PlayerManager : MonoBehaviour
     public void DecrementStoneCount(Player player)
     {
         stoneCount[player]--;
+        PlayerSyncMessage syncMsg = new PlayerSyncMessage(stoneCount);
+        BackendMatchManager.Instance.SendDataToInGame(syncMsg);
         if (stoneCount[player] <= 0)
         {
             GameManager.Instance.EndGame();
@@ -34,11 +37,7 @@ public class PlayerManager : MonoBehaviour
     public void IncrementStoneCount(int clingStone, Player player)
     {
         stoneCount[player] += clingStone;
-    }
-
-    // 플레이어 돌 갯수 
-    public int GetStoneCount(Player player)
-    {
-        return stoneCount[player];
+        PlayerSyncMessage syncMsg = new PlayerSyncMessage(stoneCount);
+        BackendMatchManager.Instance.SendDataToInGame(syncMsg);
     }
 }
