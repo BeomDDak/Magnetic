@@ -20,6 +20,11 @@ public class BackendManager : Singleton<BackendManager>
     [SerializeField]
     private TMP_InputField backendSignUpPassChaeck;
 
+    protected override void Init()
+    {
+        isDestoryOnLoad = true;
+    }
+
     void Start()
     {
         var bro = Backend.Initialize(); // 뒤끝 초기화

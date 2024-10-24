@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 using static Define;
-using BackEnd;
 using BackEnd.Tcp;
 using Protocol;
+using System.Linq;
 
 public class GameManager : Singleton<GameManager>
 {
@@ -46,7 +44,6 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
-        StartGame();
         
     }
 
@@ -56,9 +53,6 @@ public class GameManager : Singleton<GameManager>
         CurrentState = GameState.Playing;
         CurrentPlayer = Player.One;         // 1플레이어 부터 시작하기 위해서
         CurrentPlayerState = PlayerState.PlayTime;
-        GameStartMessage msg = new GameStartMessage();
-        BackendMatchManager.Instance.SendDataToInGame(msg);
-
         Debug.Log("현재 차례 : " + CurrentPlayer);
     }
     
@@ -81,9 +75,7 @@ public class GameManager : Singleton<GameManager>
     // 카메라
     private void SetCameraPosition()
     {
-        GameStartMessage msg = new GameStartMessage();
-
-        if(BackendMatchManager.Instance.players.ContainsValue(Player.One))
+        if(BackendMatchManager.Instance.IsMyPlayer(Player.One))
         {
             cam.transform.parent = camPosition[0].transform;
         }
@@ -91,10 +83,10 @@ public class GameManager : Singleton<GameManager>
         {
             cam.transform.parent = camPosition[1].transform;
         }
+        Debug.Log(cam.transform);
 
-        cam.transform.position = Vector3.zero;
-        cam.transform.rotation = Quaternion.identity;
-        BackendMatchManager.Instance.SendDataToInGame<GameStartMessage>(msg);
+        cam.transform.localPosition = Vector3.zero;
+        cam.transform.localRotation = Quaternion.identity;
     }
 
     public void OnRecieve(MatchRelayEventArgs args)
@@ -122,12 +114,21 @@ public class GameManager : Singleton<GameManager>
         {
             case Protocol.Type.GameStart:       // 게임 시작 ( 카메라 )
                 GameStartMessage gameStart = DataParser.ReadJsonData<GameStartMessage>(args.BinaryUserData);
-                StartGame();
                 SetCameraPosition();
+                StartGame();
                 break;
             case Protocol.Type.StonePlacement:      // 랜딩
                 StonePlacementMessage stoneMsg = DataParser.ReadJsonData<StonePlacementMessage>(args.BinaryUserData);
                 landing.ProcessStonePlacement(stoneMsg);
+                break;
+            case Protocol.Type.StoneSync:
+                StoneSyncMessage syncMsg = DataParser.ReadJsonData<StoneSyncMessage>(args.BinaryUserData);
+                ProcessStoneSync(syncMsg);
+                break;
+
+            case Protocol.Type.PlayerSync:
+                PlayerSyncMessage playerMsg = DataParser.ReadJsonData<PlayerSyncMessage>(args.BinaryUserData);
+                ProcessPlayerSync(playerMsg);
                 break;
             case Protocol.Type.GameEnd:
                 EndGame();
@@ -136,6 +137,49 @@ public class GameManager : Singleton<GameManager>
                 Debug.Log("찾을 수 없는 타입입니다.");
                 return;
         }
+    }
+
+    private void ProcessStoneSync(StoneSyncMessage msg)
+    {
+        Stone stone = FindStoneById(msg.stoneId);
+        if (stone != null)
+        {
+            Rigidbody rb = stone.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                // 물리 상태 동기화
+                rb.position = new Vector3(msg.posX, msg.posY, msg.posZ);
+                rb.rotation = new Quaternion(msg.rotX, msg.rotY, msg.rotZ, msg.rotW);
+                rb.velocity = new Vector3(msg.velX, msg.velY, msg.velZ);
+                rb.angularVelocity = new Vector3(msg.angVelX, msg.angVelY, msg.angVelZ);
+
+                // 붙어있는 돌들 처리
+                foreach (string attachedId in msg.attachedStoneIds)
+                {
+                    Stone attachedStone = FindStoneById(attachedId);
+                    if (attachedStone != null && !stone.IsConnectedTo(attachedStone.gameObject))
+                    {
+                        stone.AttachObject(attachedStone.gameObject);
+                    }
+                }
+            }
+        }
+    }
+
+    private void ProcessPlayerSync(PlayerSyncMessage msg)
+    {
+        foreach (var pair in msg.playerStones)
+        {
+            Player player = (Player)Enum.Parse(typeof(Player), pair.Key);
+            playerManager.stoneCount[player] = pair.Value;
+        }
+    }
+
+    private Stone FindStoneById(string id)
+    {
+        // Scene에서 모든 Stone 컴포넌트를 찾아 ID로 매칭
+        Stone[] allStones = FindObjectsOfType<Stone>();
+        return allStones.FirstOrDefault(s => s.stoneId == id);
     }
 
     private void Update()

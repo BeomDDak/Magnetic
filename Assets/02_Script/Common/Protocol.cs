@@ -10,7 +10,8 @@ namespace Protocol
         GameStart,
         GameEnd,
         StonePlacement,
-        PlayerSync,     // 플레이어 상태 동기화를 위한 타입
+        StoneSync,      // 돌의 상태 동기화
+        PlayerSync,     // 플레이어 상태 동기화
 
     }
 
@@ -47,6 +48,32 @@ namespace Protocol
             this.posZ = pos.z;
             this.stoneIndex = index;
             this.player = currentPlayer;
+        }
+    }
+
+    public class StoneSyncMessage : Message
+    {
+        public string stoneId;
+        public float posX, posY, posZ;           // 위치
+        public float rotX, rotY, rotZ, rotW;     // 회전
+        public float velX, velY, velZ;           // 속도
+        public float angVelX, angVelY, angVelZ;  // 각속도
+        public List<string> attachedStoneIds;    // 붙어있는 돌들의 ID
+
+        public StoneSyncMessage(
+            string id,
+            Vector3 position,
+            Quaternion rotation,
+            Vector3 velocity,
+            Vector3 angularVelocity,
+            List<string> attachedIds) : base(Type.StoneSync)
+        {
+            stoneId = id;
+            posX = position.x; posY = position.y; posZ = position.z;
+            rotX = rotation.x; rotY = rotation.y; rotZ = rotation.z; rotW = rotation.w;
+            velX = velocity.x; velY = velocity.y; velZ = velocity.z;
+            angVelX = angularVelocity.x; angVelY = angularVelocity.y; angVelZ = angularVelocity.z;
+            attachedStoneIds = attachedIds;
         }
     }
 

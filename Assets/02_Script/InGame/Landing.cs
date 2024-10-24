@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using static Define;
-using BackEnd;
-using BackEnd.Tcp;
 using System;
 using Protocol;
 
@@ -42,11 +38,17 @@ public class Landing : MonoBehaviour
     private void Start()
     {
         gameManager.OnGame += StartLanding;
-        //Backend.Match.OnMatchInGameAccess = OnMatchInGameAccess;
     }
 
     private void StartLanding()
     {
+        // 현재 턴이 아니면 리턴
+        if (!BackendMatchManager.Instance.IsMyPlayer(GameManager.Instance.CurrentPlayer))
+        {
+            return; // 내 턴이 아니면 리턴
+        }
+
+
         if (playerManager.stoneCount.Any(pair => pair.Value < -1))
         {
             gameManager.CurrentState = GameState.GameOver;

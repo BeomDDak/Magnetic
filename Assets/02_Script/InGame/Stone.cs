@@ -1,7 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Define;
+using Protocol;
 
 public class Stone : MonoBehaviour
 {
@@ -10,11 +10,13 @@ public class Stone : MonoBehaviour
     public Player m_CurrentPlayer;
 
     private GameObject startStone;
+    public string stoneId;  // 네트워크 동기화를 위한 ID 추가
 
     private void Awake()
     {
         magnet = GetComponent<Magnet>();
         m_CurrentPlayer = Player.None;
+        stoneId = System.Guid.NewGuid().ToString();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -24,11 +26,10 @@ public class Stone : MonoBehaviour
         {
             startStone = this.gameObject;
             AttachObject(otherAttacher.gameObject);
-            //StartCoroutine(collision.gameObject.GetComponent<Magnet>().PullStones());
         }
     }
 
-    private void AttachObject(GameObject obj)
+    public void AttachObject(GameObject obj)
     {
         Rigidbody objRb = obj.GetComponent<Rigidbody>();
         if (objRb == null)
@@ -52,9 +53,31 @@ public class Stone : MonoBehaviour
 
         // 붙었다면 오브젝트 확인
         magnet.cling = true;
+
+        // 상태 동기화 메시지 전송
+        List<string> attachedIds = new List<string>();
+        foreach (var connectobj in CountConnectedObjects())
+        {
+            Stone attachedStone = connectobj.GetComponent<Stone>();
+            if (attachedStone != null)
+            {
+                attachedIds.Add(attachedStone.stoneId);
+            }
+        }
+
+        StoneSyncMessage msg = new StoneSyncMessage(
+            stoneId,
+            transform.position,
+            transform.rotation,
+            objRb.velocity,
+            objRb.angularVelocity,
+            attachedIds
+        );
+        BackendMatchManager.Instance.SendDataToInGame(msg);
+
     }
 
-    private bool IsConnectedTo(GameObject obj)
+    public bool IsConnectedTo(GameObject obj)
     {
         return joints.Exists(j => j.connectedBody.gameObject == obj);
     }

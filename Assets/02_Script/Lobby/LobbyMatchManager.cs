@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BackEnd;
 using BackEnd.Tcp;
+using Protocol;
 
 public partial class BackendMatchManager : Singleton<BackendMatchManager>
 {
@@ -121,8 +122,17 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
 
     IEnumerator StartInGame()
     {
+        SceneLoader.Instance.LoadSceneAsync(SceneType.InGame);
         yield return new WaitForSeconds(1f);
-        SceneLoader.Instance.LoadScene(SceneType.InGame);
+
+        Debug.Log("인게임 스타트 함수");
+        if (IsHost())
+        {
+            GameStartMessage msg = new GameStartMessage();
+            Debug.Log(msg);
+            SendDataToInGame(msg);
+            Debug.Log("센드데이터투인게임");
+        }
     }
 
     // 버튼에 연결
@@ -375,21 +385,15 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
         // 최초 룸에 접속했을 때 1회 수신됨
         // 재접속 했을 때도 1회 수신됨 -> 매치 시작 서버에 확인 받아야됨.
         sessionIdList = new List<SessionId>();
-        gameRecords = new Dictionary<SessionId, MatchUserGameRecord>();
-        int playerNum = 0;
-        players.Clear();
+        gameRecords = new Dictionary<SessionId, MatchUserGameRecord>();     
 
         foreach (var record in args.GameRecords)
         {
             sessionIdList.Add(record.m_sessionId);
             gameRecords.Add(record.m_sessionId, record);
-            players.Add(record.m_sessionId,(Define.Player)playerNum);
-            playerNum++;
         }
 
         sessionIdList.Sort();
-        Debug.Log(sessionIdList[0].ToString());
-        Debug.Log(sessionIdList[1].ToString());
     }
 
     // 클라이언트 들의 게임 룸 접속에 대한 리턴값
@@ -421,17 +425,31 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
         // 세션 정보는 누적되어 들어있기 때문에 이미 저장한 세션이면 건너뛴다.
 
         var record = args.GameRecord;
+        int playerNum = 0;
+        players.Clear();
+
         Debug.Log(string.Format(string.Format("인게임 접속 유저 정보 [{0}] : {1}", args.GameRecord.m_sessionId, args.GameRecord.m_nickname)));
         if (!sessionIdList.Contains(args.GameRecord.m_sessionId))
         {
             // 세션 정보, 게임 기록 등을 저장
             sessionIdList.Add(record.m_sessionId);
             gameRecords.Add(record.m_sessionId, record);
-
-
             Debug.Log(string.Format(NUM_INGAME_SESSION, sessionIdList.Count));
         }
-        
+
+        if(sessionIdList.Count >= 2)
+        {
+            for (int i = 0; i < sessionIdList.Count; i++)
+            {
+                players.Add(record.m_sessionId, (Define.Player)playerNum);
+                playerNum++;
+                Debug.Log($"SessionId: {players.Keys}, Player: {players.Values}");
+            }
+            foreach (var pair in players)
+            {
+                Debug.Log($"SessionId: {pair.Key}, Player: {pair.Value}");
+            }
+        }
     }
 
     // 인게임 서버 접속 종료
