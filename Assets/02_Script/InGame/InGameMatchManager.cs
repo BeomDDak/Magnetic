@@ -34,10 +34,23 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
     {
         SessionId mySessionId = Backend.Match.GetMySessionId();
 
-        // 현재 세션의 플레이어 값 확인
-        if (players.TryGetValue(mySessionId, out Define.Player myPlayer))
+        Debug.Log($"IsMyPlayer 체크 - 내 세션: {mySessionId}");
+        Debug.Log($"등록된 플레이어 수: {players.Count}");
+        foreach (var pair in players)
         {
-            return myPlayer == player;
+            Debug.Log($"등록된 플레이어 정보 - SessionId: {pair.Key}, Player: {pair.Value}");
+        }
+
+        if(sessionIdList.Count > 0)
+        {
+            if (mySessionId == sessionIdList[0])
+            {
+                return player == Define.Player.One;
+            }
+            else
+            {
+                return player == Define.Player.Two;
+            }
         }
         Debug.LogError($"플레이어를 찾을 수 없습니다. SessionId: {mySessionId}");
         return false;

@@ -18,7 +18,7 @@ public class Magnet : MonoBehaviour
     private bool isSwitchTurn;      // 턴 교체 중인지 판단 (충돌하거나 연결될 시 여러 스톤에서 중복 호출 발생된 것을 확인)
 
     private Rigidbody rb;           // 서버에 전달할 vel값
-    public Coroutine syncCoroutine { get; set; }    // 서버에 전달할 코루틴
+    //public Coroutine syncCoroutine { get; set; }    // 서버에 전달할 코루틴
 
     private void Awake()
     {
@@ -31,7 +31,7 @@ public class Magnet : MonoBehaviour
     {
         center = GameManager.Instance.landing.landingPoint;
         StartCoroutine(PullStones());
-        syncCoroutine = StartCoroutine(SyncStoneState());
+        //syncCoroutine = StartCoroutine(SyncStoneState());
     }
 
     public IEnumerator PullStones()
@@ -49,16 +49,24 @@ public class Magnet : MonoBehaviour
             Debug.Log("주변에 돌이 없습니다. 턴을 종료합니다.");
             GameManager.Instance.SwitchTurn();
             GetComponent<Magnet>().enabled = false;
-            StopCoroutine(syncCoroutine);
+            //StopCoroutine(syncCoroutine);
             yield break;
         }
-
         Debug.Log($"주변에 {anyStones.Length}개의 돌이 감지되었습니다.");
+
+        // 영향을 받는 모든 돌들을 저장
+        List<Stone> affectedStones = new List<Stone>();
+        foreach (Collider stone in anyStones)
+        {
+            Stone stoneComponent = stone.GetComponent<Stone>();
+            affectedStones.Add(stoneComponent);
+
+        }
 
         while (magnetTime > 0f)
         {
             magnetTime -= Time.deltaTime;
-            foreach (Collider stone in anyStones)
+            foreach (Stone stone in affectedStones)
             {
                 float distance = Vector3.Distance(center, stone.transform.position);
                 if (distance <= magnetRange)
@@ -66,30 +74,53 @@ public class Magnet : MonoBehaviour
                     float magnetForce = CalculateMagnetForce(distance);
                     Vector3 pullDirection = (center - stone.transform.position).normalized;
                     stone.transform.position += pullDirection * magnetForce * Time.deltaTime;
+
+                    // 모든 연결된 돌들의 상태도 포함하여 동기화
+                    List<Stone> connectedStones = new List<Stone>();
+                    foreach (var obj in stone.CountConnectedObjects())
+                    {
+                        Stone connectedStone = obj.GetComponent<Stone>();
+                        if (connectedStone != null)
+                        {
+                            connectedStones.Add(connectedStone);
+                        }
+                    }
+
+                    // 각 돌의 상태 동기화
+                    foreach (Stone stonestate in connectedStones)
+                    {
+                        StoneSyncMessage msg = new StoneSyncMessage(
+                            stone.stoneId,
+                            stone.transform.position,
+                            stone.transform.rotation,
+                            stone.GetComponent<Rigidbody>().velocity,
+                            stone.GetComponent<Rigidbody>().angularVelocity,
+                            stone.CountConnectedObjects().Select(obj => obj.GetComponent<Stone>().stoneId).ToList()
+                        );
+                        BackendMatchManager.Instance.SendDataToInGame(msg);
+                    }
                 }
             }
             yield return null;
         }
 
-        if (cling)
+        if (cling && OppentStone())
         {
-            if (OppentStone())
+            StartCoroutine(SyncStoneState());
+            // 상대방 플레이어 결정
+            Player opponentPlayer = (GameManager.Instance.CurrentPlayer == Player.One) ? Player.Two : Player.One;
+
+            // 상대방 플레이어의 돌 갯수 증가
+            GameManager.Instance.playerManager.IncrementStoneCount(m_stone.CountConnectedObjects().Count, opponentPlayer);
+            Debug.Log($"붙은갯수:{m_stone.CountConnectedObjects().Count} 추가되는 곳:{opponentPlayer}");
+            Debug.Log(GameManager.Instance.playerManager.stoneCount);
+
+            for (int i = 0; i < m_stone.CountConnectedObjects().Count; i++)
             {
-                // 상대방 플레이어 결정
-                Player opponentPlayer = (GameManager.Instance.CurrentPlayer == Player.One) ? Player.Two : Player.One;
-
-                // 상대방 플레이어의 돌 갯수 증가
-                GameManager.Instance.playerManager.IncrementStoneCount(m_stone.CountConnectedObjects().Count, opponentPlayer);
-                Debug.Log($"붙은갯수:{m_stone.CountConnectedObjects().Count} 추가되는 곳:{opponentPlayer}");
-                Debug.Log(GameManager.Instance.playerManager.stoneCount);
-
-                for (int i = 0; i < m_stone.CountConnectedObjects().Count; i++)
-                {
-                    m_stone.CountConnectedObjects()[i].SetActive(false);
-                }
-
-                this.gameObject.SetActive(false);
+                m_stone.CountConnectedObjects()[i].SetActive(false);
             }
+
+            this.gameObject.SetActive(false);
         }
 
         if (!isSwitchTurn)
@@ -97,7 +128,7 @@ public class Magnet : MonoBehaviour
             GameManager.Instance.SwitchTurn();
             isSwitchTurn = true;
         }
-        StopCoroutine(syncCoroutine);
+        //StopCoroutine(syncCoroutine);
         GetComponent<Magnet>().enabled = false;
     }
 

@@ -42,11 +42,6 @@ public class GameManager : Singleton<GameManager>
         landing = GetComponent<Landing>();
     }
 
-    private void Start()
-    {
-        
-    }
-
     // 게임 시작시 해줄 작업
     public void StartGame()
     {
@@ -69,7 +64,6 @@ public class GameManager : Singleton<GameManager>
         CurrentPlayer = (CurrentPlayer == Player.One) ? Player.Two : Player.One;
         CurrentPlayerState = PlayerState.PlayTime;
         Debug.Log("현재 차례 : " + CurrentPlayer);
-        //OnTurnChanged?.Invoke(CurrentPlayer);
     }
 
     // 카메라
@@ -125,7 +119,6 @@ public class GameManager : Singleton<GameManager>
                 StoneSyncMessage syncMsg = DataParser.ReadJsonData<StoneSyncMessage>(args.BinaryUserData);
                 ProcessStoneSync(syncMsg);
                 break;
-
             case Protocol.Type.PlayerSync:
                 PlayerSyncMessage playerMsg = DataParser.ReadJsonData<PlayerSyncMessage>(args.BinaryUserData);
                 ProcessPlayerSync(playerMsg);

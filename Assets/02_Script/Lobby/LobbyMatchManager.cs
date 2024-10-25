@@ -441,13 +441,8 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
         {
             for (int i = 0; i < sessionIdList.Count; i++)
             {
-                players.Add(record.m_sessionId, (Define.Player)playerNum);
+                players.Add(sessionIdList[i], (Define.Player)playerNum);
                 playerNum++;
-                Debug.Log($"SessionId: {players.Keys}, Player: {players.Values}");
-            }
-            foreach (var pair in players)
-            {
-                Debug.Log($"SessionId: {pair.Key}, Player: {pair.Value}");
             }
         }
     }

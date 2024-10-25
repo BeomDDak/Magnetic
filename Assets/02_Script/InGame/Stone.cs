@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Define;
 using Protocol;
+using System.Linq;
 
 public class Stone : MonoBehaviour
 {
@@ -9,14 +10,17 @@ public class Stone : MonoBehaviour
     private Magnet magnet;
     public Player m_CurrentPlayer;
 
-    private GameObject startStone;
+    public GameObject startStone;
     public string stoneId;  // 네트워크 동기화를 위한 ID 추가
+    private Rigidbody rb;
 
     private void Awake()
     {
         magnet = GetComponent<Magnet>();
+        rb = GetComponent<Rigidbody>();
         m_CurrentPlayer = Player.None;
         stoneId = System.Guid.NewGuid().ToString();
+
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -26,17 +30,13 @@ public class Stone : MonoBehaviour
         {
             startStone = this.gameObject;
             AttachObject(otherAttacher.gameObject);
+            SendStoneSyncMessge();
         }
     }
 
     public void AttachObject(GameObject obj)
     {
         Rigidbody objRb = obj.GetComponent<Rigidbody>();
-        if (objRb == null)
-        {
-            objRb = obj.AddComponent<Rigidbody>();
-        }
-
         FixedJoint newJoint = gameObject.AddComponent<FixedJoint>();
         newJoint.connectedBody = objRb;
         joints.Add(newJoint);
@@ -53,7 +53,10 @@ public class Stone : MonoBehaviour
 
         // 붙었다면 오브젝트 확인
         magnet.cling = true;
+    }
 
+    public void SendStoneSyncMessge()
+    {
         // 상태 동기화 메시지 전송
         List<string> attachedIds = new List<string>();
         foreach (var connectobj in CountConnectedObjects())
@@ -69,12 +72,11 @@ public class Stone : MonoBehaviour
             stoneId,
             transform.position,
             transform.rotation,
-            objRb.velocity,
-            objRb.angularVelocity,
+            rb.velocity,
+            rb.angularVelocity,
             attachedIds
         );
         BackendMatchManager.Instance.SendDataToInGame(msg);
-
     }
 
     public bool IsConnectedTo(GameObject obj)
