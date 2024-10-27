@@ -63,13 +63,13 @@ public class Landing : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             stoneManager.landingStone.transform.position = landingPoint;
-            stoneManager.stoneColl.enabled = false;
+            //stoneManager.stoneColl.enabled = false;
             PreviewLandingPoint();
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-            stoneManager.stoneColl.enabled = true;
+            //stoneManager.stoneColl.enabled = true;
             Destroy(stoneManager.landingStone);
             LandingPointStone();
         }

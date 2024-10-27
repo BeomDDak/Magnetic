@@ -52,6 +52,7 @@ public class Magnet : MonoBehaviour
             //StopCoroutine(syncCoroutine);
             yield break;
         }
+
         Debug.Log($"주변에 {anyStones.Length}개의 돌이 감지되었습니다.");
 
         // 영향을 받는 모든 돌들을 저장
@@ -60,7 +61,6 @@ public class Magnet : MonoBehaviour
         {
             Stone stoneComponent = stone.GetComponent<Stone>();
             affectedStones.Add(stoneComponent);
-
         }
 
         while (magnetTime > 0f)

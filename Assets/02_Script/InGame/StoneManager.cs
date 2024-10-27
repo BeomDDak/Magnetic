@@ -15,7 +15,7 @@ public class StoneManager : MonoBehaviour
     public GameObject landingStone;    // 돌 ( 착수되기 전 보여줄 오브젝트 )
     public int stoneTypesCount { get; private set; }  // 돌 종류 갯수 ( 돌 랜덤값 뽑기 위해 )
     public List<int> stoneIndex { get; private set; } = new List<int>(); // 플레이어가 사용하는 돌의 인덱스를 저장
-    public Collider stoneColl { get; set; }
+    // public Collider stoneColl { get; set; }
     GameManager gameManager;
 
     private void Awake()
@@ -64,6 +64,6 @@ public class StoneManager : MonoBehaviour
         }
 
         // 콜라이더도 붙여주기
-        stoneColl = landingStone.GetComponent<Collider>();
+        // stoneColl = landingStone.GetComponent<Collider>();
     }
 }
