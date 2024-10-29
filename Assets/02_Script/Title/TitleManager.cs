@@ -33,26 +33,4 @@ public class TitleManager : MonoBehaviour
             yield return null;
         }
     }
-
-    public void OnClickLogin()
-    {
-        LoginUI.SetActive(true);
-        /*BackendReturnObject bro = Backend.BMember.LoginWithTheBackendToken();
-        if (bro.IsSuccess())
-        {
-            Debug.Log("뒤끝 로그인 성공");
-            SceneLoader.Instance.LoadScene(SceneType.Lobby);
-        }
-        else if (!bro.IsSuccess())
-        {
-            Debug.Log("구글 로그인 성공");
-            GoogleManager.Instance.GoogleLogin();
-            SceneLoader.Instance.LoadScene(SceneType.Lobby);
-        }
-        else
-        {
-            Debug.Log("자동 로그인 실패");
-            LoginUI.SetActive(true);
-        }*/
-    }
 }
