@@ -33,7 +33,7 @@ RectTransform:
   - {fileID: 7978634885411661988}
   - {fileID: 6950546704750918914}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -262,10 +262,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Design and programming by gamevanilla and ricimi.
+  m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 6e51eeb714dfb419eacd36995b94e50e, type: 2}
-  m_sharedMaterial: {fileID: 21016810663687464, guid: 6e51eeb714dfb419eacd36995b94e50e,
+  m_fontAsset: {fileID: 11400000, guid: 72dea55e1f97749429cfcf41851fd9a5, type: 2}
+  m_sharedMaterial: {fileID: 2731957327699266611, guid: 72dea55e1f97749429cfcf41851fd9a5,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BackEnd;
 using TMPro;
+using System.Security.Cryptography;
 
 public class BackendManager : Singleton<BackendManager>
 {
@@ -11,6 +12,7 @@ public class BackendManager : Singleton<BackendManager>
     private TMP_InputField backendLoginID;
     [SerializeField]
     private TMP_InputField backendLoginPass;
+    private bool successLogin;
 
     // 회원가입
     [SerializeField]
@@ -23,10 +25,12 @@ public class BackendManager : Singleton<BackendManager>
     // UI
     [SerializeField]
     private GameObject SignUI;
+    private UIManager m_UIManager;
 
     protected override void Init()
     {
         isDestoryOnLoad = true;
+        m_UIManager = UIManager.Instance;
     }
 
     void Start()
@@ -52,7 +56,8 @@ public class BackendManager : Singleton<BackendManager>
 
         if (_pw != _pwCheck)
         {
-            Debug.Log("패스워드가 일치하지 않습니다");
+            m_UIManager.LoginMessageText.text = m_UIManager.SIGNUP_FAIL_DONTMATCHPW;
+            StartCoroutine(ShowUI());
             return;
         }
 
@@ -60,7 +65,7 @@ public class BackendManager : Singleton<BackendManager>
 
         if (bro.IsSuccess())
         {
-            Debug.Log("회원가입에 성공했습니다. : " + bro);
+            m_UIManager.LoginMessageText.text = m_UIManager.SIGNUP_SUCCESS;
             UIManager.Instance.CloseUI(SignUI);
         }
         else
@@ -71,12 +76,10 @@ public class BackendManager : Singleton<BackendManager>
 
             if (errorCode == "DuplicatedParameterException" && message.Contains("Duplicated customId"))
             {
-                Debug.Log("중복된 아이디 입니다");
+                m_UIManager.LoginMessageText.text = m_UIManager.SIGNUP_FAIL_SAMEID;
             }
-
-            Debug.LogError("회원가입에 실패했습니다. : " + bro);
         }
-
+        StartCoroutine(ShowUI());
     }
 
     public void Login()
@@ -88,23 +91,32 @@ public class BackendManager : Singleton<BackendManager>
 
         if (bro.IsSuccess())
         {
-            Debug.Log("로그인이 성공했습니다. : " + bro);
-
-            Backend.BMember.UpdateNickname("user" + Time.time);
-
-            SceneLoader.Instance.LoadScene(SceneType.Lobby);
+            m_UIManager.LoginMessageText.text = m_UIManager.LOGIN_SUCCESS;
+            successLogin = true;
         }
         else
         {
             if (bro.StatusCode == 400)
             {
-                Debug.Log("아이디 혹은 비밀번호를 확인할 수 없습니다");
+                m_UIManager.LoginMessageText.text = m_UIManager.LOGIN_FAIL_CANTCONFIRM;
             }
             else if (bro.StatusCode == 401)
             {
-                Debug.Log("아이디 혹은 비밀번호가 잘못되었습니다");
+                m_UIManager.LoginMessageText.text = m_UIManager.LOGIN_FAIL_DONTMATCH;
             }
-            Debug.LogError("로그인이 실패했습니다. : " + bro);
+        }
+        StartCoroutine(ShowUI());
+    }
+
+    IEnumerator ShowUI()
+    {
+        m_UIManager.OpenUI(m_UIManager.LoginMessageUI);
+        yield return new WaitForSeconds(0.5f);
+        m_UIManager.CloseUI(m_UIManager.LoginMessageUI);
+        
+        if (successLogin)
+        {
+            SceneLoader.Instance.LoadScene(SceneType.Lobby);
         }
     }
 
