@@ -125,23 +125,42 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
         SceneLoader.Instance.LoadSceneAsync(SceneType.InGame);
         yield return new WaitForSeconds(1f);
 
-        Debug.Log("인게임 스타트 함수");
         if (IsHost())
         {
             GameStartMessage msg = new GameStartMessage();
             Debug.Log(msg);
             SendDataToInGame(msg);
-            Debug.Log("센드데이터투인게임");
         }
     }
 
+    public void StartGameBtn()
+    {
+        if(BackendGameData.userData.energy <= 0)
+        {
+            LobbyUIManager.Instance.OpenPopup("에너지가 부족합니다");
+            return;
+        }
+
+        if(BackendGameData.userData.userName == string.Empty)
+        {
+            LobbyUIManager.Instance.OpenPopup("닉네임을 만들어주세요");
+            return;
+        }
+
+        StartMatchmakingProcess();
+    }
+
+    public void RankGameBtn()
+    {
+        LobbyUIManager.Instance.OpenPopup("준비중입니다");
+    }
+
     // 버튼에 연결
-    public void StartMatchmakingProcess()
+    private void StartMatchmakingProcess()
     {
         // 순서 1. 매치리스트의 정보를 가져오기
         Backend.Match.GetMatchList();
         Debug.Log(Backend.Match.GetMatchList());
-        Debug.Log("매치 리스트 불러오기 성공");
         // 순서 2. 매치 리스트를 불러오면 매치메이킹 서버 접속 요청
         JoinMatchServer();
     }

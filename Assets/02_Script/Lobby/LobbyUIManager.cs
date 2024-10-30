@@ -7,42 +7,68 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 
-public class LobbyUIManager : MonoBehaviour
+public class LobbyUIManager : Singleton<LobbyUIManager>
 {
+    public GameObject popupUI;
+    public TextMeshProUGUI popupText;
+
     public TextMeshProUGUI lobbyNickName;
     public TextMeshProUGUI profileNickName;
     public TMP_InputField changeNickName;
+    public TextMeshProUGUI lobbyWinCount;
+    public TextMeshProUGUI winCount;
+    public TextMeshProUGUI lobbyLoseCount;
+    public TextMeshProUGUI loseCount;
     public TextMeshProUGUI energyCount;
-    public static int energy = 5;
+
+    protected override void Init()
+    {
+        base.Init();
+        isDestoryOnLoad = true;
+    }
 
     private void Start()
     {
-        Nick();
+        SetInfo();
     }
 
-    void Nick()
+    private void SetInfo()
     {
-        if(changeNickName == null)
-        {
-            changeNickName.text = " ";
-        }
-        lobbyNickName.text = $"{changeNickName}";
-        profileNickName.text = $"닉 네 임 :{lobbyNickName}";
+        lobbyNickName.text = $"{BackendGameData.userData.userName}";
+        profileNickName.text = $"닉 네 임 :{BackendGameData.userData.userName}";
+        lobbyWinCount.text = $"승: {BackendGameData.userData.win}";
+        winCount.text = $"승 : {BackendGameData.userData.win}";
+        lobbyLoseCount.text = $"패 : {BackendGameData.userData.lose}";
+        loseCount.text = $"패: {BackendGameData.userData.lose}";
+        energyCount.text = BackendGameData.userData.energy.ToString();
     }
 
     public void ChangeNick()
     {
+        if(changeNickName.text.Length > 8)
+        {
+            OpenPopup("닉네임이 너무 깁니다");
+            return;
+        }
+
         var bro = Backend.BMember.UpdateNickname(changeNickName.text);
 
         if (bro.IsSuccess())
         {
-            Debug.Log("닉네임 변경에 성공했습니다 : " + bro);
-            Nick();
+            OpenPopup("닉네임 변경에 성공했습니다");
+            BackendGameData.Instance.GameDataUpdate();
         }
         else
         {
-            Debug.LogError("닉네임 변경에 실패했습니다 : " + bro);
+            OpenPopup("닉네임 변경에 실패했습니다");
         }
     }
 
+    public IEnumerator OpenPopup(string message)
+    {
+        popupUI.SetActive(true);
+        popupText.text = message;
+        yield return new WaitForSeconds(1f);
+        popupUI.SetActive(false);
+    }
 }

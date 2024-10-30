@@ -6,7 +6,8 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
 {
     private void GameSetup()
     {
-        LobbyUIManager.energy -= 1;
+        BackendGameData.userData.energy -= 1;
+        BackendGameData.Instance.GameDataUpdate();
         isHost = false;
         isSetHost = false;
         OnGameReady();

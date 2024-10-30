@@ -5,6 +5,12 @@ using TMPro;
 
 public class UIManager : Singleton<UIManager>
 {
+    protected override void Init()
+    {
+        base.Init();
+        isDestoryOnLoad = true;
+    }
+
     // 로그인
     public GameObject LoginMessageUI;
     public TextMeshProUGUI LoginMessageText;
@@ -14,9 +20,6 @@ public class UIManager : Singleton<UIManager>
     public string SIGNUP_SUCCESS = "회원가입에 성공했습니다";
     public string SIGNUP_FAIL_SAMEID = "중복된 아이디 입니다";
     public string SIGNUP_FAIL_DONTMATCHPW = "패스워드가 일치하지 않습니다";
-
-
-
 
     public void OpenUI(GameObject _ui)
     {

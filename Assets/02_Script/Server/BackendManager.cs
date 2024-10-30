@@ -1,9 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using BackEnd;
 using TMPro;
-using System.Security.Cryptography;
 
 public class BackendManager : Singleton<BackendManager>
 {
@@ -120,25 +118,5 @@ public class BackendManager : Singleton<BackendManager>
         {
             SceneLoader.Instance.LoadScene(SceneType.Lobby);
         }
-    }
-
-    void UpdateNickname()
-    {
-        BackendLogin.Instance.UpdateNickname("아이폰");
-        Debug.Log("테스트를 종료합니다");
-    }
-
-    void GameDataInsert()
-    {
-        BackendGameData.Instance.GameDataGet(); //[추가] 데이터 불러오기 함수
-
-        if (BackendGameData.userData == null)
-        {
-            BackendGameData.Instance.GameDataInsert();
-        }
-
-        BackendGameData.Instance.LevelUp(); // [추가] 로컬에 저장된 데이터를 변경
-
-        BackendGameData.Instance.GameDataUpdate(); //[추가] 서버에 저장된 데이터를 덮어쓰기(변경된 부분만)
     }
 }
