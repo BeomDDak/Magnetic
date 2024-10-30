@@ -26,15 +26,16 @@ public class BackendManager : Singleton<BackendManager>
     [SerializeField]
     private GameObject SignUI;
     private UIManager m_UIManager;
+    string UImessage;
 
     protected override void Init()
     {
-        isDestoryOnLoad = true;
-        m_UIManager = UIManager.Instance;
+        isDestoryOnLoad = true; 
     }
 
     void Start()
     {
+        m_UIManager = UIManager.Instance;
         var bro = Backend.Initialize(); // 뒤끝 초기화
 
         // 뒤끝 초기화에 대한 응답값
@@ -56,8 +57,8 @@ public class BackendManager : Singleton<BackendManager>
 
         if (_pw != _pwCheck)
         {
-            m_UIManager.LoginMessageText.text = m_UIManager.SIGNUP_FAIL_DONTMATCHPW;
-            StartCoroutine(ShowUI());
+            UImessage = m_UIManager.SIGNUP_FAIL_DONTMATCHPW;
+            StartCoroutine(ShowUI(UImessage));
             return;
         }
 
@@ -65,7 +66,7 @@ public class BackendManager : Singleton<BackendManager>
 
         if (bro.IsSuccess())
         {
-            m_UIManager.LoginMessageText.text = m_UIManager.SIGNUP_SUCCESS;
+            UImessage = m_UIManager.SIGNUP_SUCCESS;
             UIManager.Instance.CloseUI(SignUI);
         }
         else
@@ -76,10 +77,10 @@ public class BackendManager : Singleton<BackendManager>
 
             if (errorCode == "DuplicatedParameterException" && message.Contains("Duplicated customId"))
             {
-                m_UIManager.LoginMessageText.text = m_UIManager.SIGNUP_FAIL_SAMEID;
+                UImessage = m_UIManager.SIGNUP_FAIL_SAMEID;
             }
         }
-        StartCoroutine(ShowUI());
+        StartCoroutine(ShowUI(UImessage));
     }
 
     public void Login()
@@ -91,27 +92,28 @@ public class BackendManager : Singleton<BackendManager>
 
         if (bro.IsSuccess())
         {
-            m_UIManager.LoginMessageText.text = m_UIManager.LOGIN_SUCCESS;
+            UImessage = m_UIManager.LOGIN_SUCCESS;
             successLogin = true;
         }
         else
         {
             if (bro.StatusCode == 400)
             {
-                m_UIManager.LoginMessageText.text = m_UIManager.LOGIN_FAIL_CANTCONFIRM;
+                UImessage = m_UIManager.LOGIN_FAIL_CANTCONFIRM;
             }
             else if (bro.StatusCode == 401)
             {
-                m_UIManager.LoginMessageText.text = m_UIManager.LOGIN_FAIL_DONTMATCH;
+                UImessage = m_UIManager.LOGIN_FAIL_DONTMATCH;
             }
         }
-        StartCoroutine(ShowUI());
+        StartCoroutine(ShowUI(UImessage));
     }
 
-    IEnumerator ShowUI()
+    IEnumerator ShowUI(string message)
     {
         m_UIManager.OpenUI(m_UIManager.LoginMessageUI);
-        yield return new WaitForSeconds(0.5f);
+        m_UIManager.LoginMessageText.text = message;
+        yield return new WaitForSeconds(1f);
         m_UIManager.CloseUI(m_UIManager.LoginMessageUI);
         
         if (successLogin)
