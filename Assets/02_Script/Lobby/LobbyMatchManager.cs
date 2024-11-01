@@ -10,7 +10,7 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
     private string gameRoomToken = string.Empty;
     private List<MatchInGameRoomInfo> matchList;
     private List<uint> playerList = new List<uint>();
-
+    //
     public Dictionary<SessionId, Define.Player> players { get; private set; } = new Dictionary<SessionId, Define.Player>();
     private void Start()
     {
