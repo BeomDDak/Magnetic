@@ -1,9 +1,14 @@
 using UnityEngine;
 using BackEnd;
 using BackEnd.Tcp;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using System.Collections;
 
 public partial class BackendMatchManager : Singleton<BackendMatchManager>
 {
+    private MatchGameResult matchGameResult;
+
     private void GameSetup()
     {
         BackendGameData.userData.energy -= 1;
@@ -63,5 +68,35 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
     {
         var byteArray = DataParser.DataToJsonData<T>(msg);
         Backend.Match.SendDataToInGameRoom(byteArray);
+    }
+
+    public void MatchGameOver(Stack<SessionId> record)
+    {
+        matchGameResult = OneOnOneRecord(record);
+
+        InGameUI.Instance.SetResultUI(matchGameResult);
+        Backend.Match.MatchEnd(matchGameResult);
+        StartCoroutine(ReturnToLobby());
+    }
+
+    private MatchGameResult OneOnOneRecord(Stack<SessionId> record)
+    {
+        MatchGameResult nowGameResult = new MatchGameResult();
+
+        nowGameResult.m_winners = new List<SessionId>();
+        nowGameResult.m_winners.Add(record.Pop());
+
+        nowGameResult.m_losers = new List<SessionId>();
+        nowGameResult.m_losers.Add(record.Pop());
+
+        nowGameResult.m_draws = null;
+
+        return nowGameResult;
+    }
+
+    private IEnumerator ReturnToLobby()
+    {
+        yield return new WaitForSeconds(2f);
+        SceneLoader.Instance.LoadScene(SceneType.Lobby);
     }
 }

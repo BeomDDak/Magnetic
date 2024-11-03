@@ -118,6 +118,20 @@ public partial class BackendMatchManager : Singleton<BackendMatchManager>
 
             GameManager.Instance.OnRecieve(args);
         };
+
+        Backend.Match.OnMatchResult += (args) =>
+        {
+            Debug.Log("게임 결과값 업로드 결과 : " + string.Format("{0} : {1}", args.ErrInfo, args.Reason));
+            // 서버에서 게임 결과 패킷을 보내면 호출
+            // 내가(클라이언트가) 서버로 보낸 결과값이 정상적으로 업데이트 되었는지 확인
+
+            if (args.ErrInfo == BackEnd.Tcp.ErrorCode.Success)
+            {
+                
+            }
+            // 세션리스트 초기화
+            sessionIdList = null;
+        };
     }
 
     IEnumerator StartInGame()

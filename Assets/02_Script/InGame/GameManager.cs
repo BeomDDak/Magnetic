@@ -30,6 +30,7 @@ public class GameManager : Singleton<GameManager>
     protected override void Init()
     {
         base.Init();
+        isDestoryOnLoad = true;
         InitializeManagers();
         cam = Camera.main;
     }
@@ -177,11 +178,6 @@ public class GameManager : Singleton<GameManager>
 
     private void Update()
     {
-        if(CurrentState == GameState.GameOver) 
-        {
-            SceneLoader.Instance.LoadScene(SceneType.Lobby);
-        }
-
         if(CurrentPlayerState == PlayerState.PlayTime)
         {
             OnGame?.Invoke();
