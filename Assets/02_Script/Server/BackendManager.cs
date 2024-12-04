@@ -117,6 +117,7 @@ public class BackendManager : Singleton<BackendManager>
         if (successLogin)
         {
             SceneLoader.Instance.LoadScene(SceneType.Lobby);
+            BackendGameData.Instance.GameDataGet();
         }
     }
 }

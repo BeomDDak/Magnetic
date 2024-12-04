@@ -88,16 +88,17 @@ public class BackendGameData
             Debug.Log("게임 정보 조회에 성공했습니다. : " + bro);
 
 
-            LitJson.JsonData gameDataJson = bro.FlattenRows(); // Json으로 리턴된 데이터를 받아옵니다.  
+            LitJson.JsonData gameDataJson = bro.FlattenRows(); // Json으로 리턴된 데이터를 받아옴  
 
-            // 받아온 데이터의 갯수가 0이라면 데이터가 존재하지 않는 것입니다.  
+            // 받아온 데이터의 갯수가 0이라면 데이터가 존재하지 않는 것 
             if (gameDataJson.Count <= 0)
             {
                 Debug.LogWarning("데이터가 존재하지 않습니다.");
+                GameDataInsert();
             }
             else
             {
-                gameDataRowInDate = gameDataJson[0]["inDate"].ToString(); //불러온 게임 정보의 고유값입니다.  
+                gameDataRowInDate = gameDataJson[0]["inDate"].ToString(); //불러온 게임 정보의 고유값  
 
                 userData = new UserData();
 

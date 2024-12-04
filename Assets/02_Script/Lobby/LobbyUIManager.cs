@@ -21,6 +21,8 @@ public class LobbyUIManager : Singleton<LobbyUIManager>
     public TextMeshProUGUI loseCount;
     public TextMeshProUGUI energyCount;
 
+    public GameObject[] nickChangeUI;
+
     protected override void Init()
     {
         base.Init();
@@ -29,7 +31,14 @@ public class LobbyUIManager : Singleton<LobbyUIManager>
 
     private void Start()
     {
-        SetInfo();
+        if(BackendGameData.userData.userName != string.Empty)
+        {
+            SetInfo();
+        }
+        else
+        {
+            SetFirstNick();
+        }
     }
 
     private void SetInfo()
@@ -43,11 +52,24 @@ public class LobbyUIManager : Singleton<LobbyUIManager>
         energyCount.text = BackendGameData.userData.energy.ToString();
     }
 
+    private void SetFirstNick()
+    {
+        for(int i = 0; i < nickChangeUI.Length; i++)
+        {
+            nickChangeUI[i].SetActive(true);
+        }
+        lobbyWinCount.text = $"승: {BackendGameData.userData.win}";
+        winCount.text = $"승 : {BackendGameData.userData.win}";
+        lobbyLoseCount.text = $"패 : {BackendGameData.userData.lose}";
+        loseCount.text = $"패: {BackendGameData.userData.lose}";
+        energyCount.text = BackendGameData.userData.energy.ToString();
+    }
+
     public void ChangeNick()
     {
         if(changeNickName.text.Length > 8)
         {
-            OpenPopup("닉네임이 너무 깁니다");
+            StartCoroutine(OpenPopup("닉네임이 너무 깁니다"));
             return;
         }
 
@@ -55,12 +77,19 @@ public class LobbyUIManager : Singleton<LobbyUIManager>
 
         if (bro.IsSuccess())
         {
-            OpenPopup("닉네임 변경에 성공했습니다");
+            StartCoroutine(OpenPopup("닉네임 변경에 성공했습니다"));
+            BackendGameData.userData.userName = changeNickName.text;
             BackendGameData.Instance.GameDataUpdate();
+            for(int i = 0;i < nickChangeUI.Length; i++)
+            {
+                nickChangeUI[i].SetActive(false);
+            }
+            lobbyNickName.text = $"{BackendGameData.userData.userName}";
+            profileNickName.text = $"닉 네 임 :{BackendGameData.userData.userName}";
         }
         else
         {
-            OpenPopup("닉네임 변경에 실패했습니다");
+            StartCoroutine(OpenPopup("닉네임 변경에 실패했습니다"));
         }
     }
 

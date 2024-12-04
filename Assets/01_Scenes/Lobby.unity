@@ -3696,13 +3696,16 @@ MonoBehaviour:
   popupUI: {fileID: 2106823782}
   popupText: {fileID: 2106823781}
   lobbyNickName: {fileID: 1865736877}
-  profileNickName: {fileID: 1136876525}
+  profileNickName: {fileID: 1860758789}
   changeNickName: {fileID: 1726259872}
   lobbyWinCount: {fileID: 1798318789}
   winCount: {fileID: 1330359703}
   lobbyLoseCount: {fileID: 1539459810}
   loseCount: {fileID: 1829011272}
   energyCount: {fileID: 1506133540}
+  nickChangeUI:
+  - {fileID: 558879631}
+  - {fileID: 34397066}
 --- !u!4 &761485503
 Transform:
   m_ObjectHideFlags: 0
@@ -9677,7 +9680,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uB2C9 \uB124 \uC784 : \uC77C\uC774\uC0BC\uC0AC\uC624\uB959\uCE60\uD314"
+  m_text: "\uB2C9 \uB124 \uC784 : "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 72dea55e1f97749429cfcf41851fd9a5, type: 2}
   m_sharedMaterial: {fileID: 2731957327699266611, guid: 72dea55e1f97749429cfcf41851fd9a5,
@@ -9974,7 +9977,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1866418621}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 761485502}
+        m_TargetAssemblyTypeName: LobbyUIManager, Assembly-CSharp
+        m_MethodName: ChangeNick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1866418621
 MonoBehaviour:
   m_ObjectHideFlags: 0

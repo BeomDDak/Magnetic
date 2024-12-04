@@ -27,11 +27,17 @@ public class Magnet : MonoBehaviour
         canClingLayer = 1 << 8;
     }
 
-    private void Start()
+    private void OnEnable()
     {
+        // 현재 턴의 플레이어가 아니라면 Magnet 컴포넌트를 활성화하지 않음
+        if (m_stone.m_CurrentPlayer != GameManager.Instance.CurrentPlayer)
+        {
+            enabled = false;
+            return;
+        }
+
         center = GameManager.Instance.landing.landingPoint;
         StartCoroutine(PullStones());
-        //syncCoroutine = StartCoroutine(SyncStoneState());
     }
 
     public IEnumerator PullStones()
